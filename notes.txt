@@ -1,0 +1,11 @@
+notes 
+
+install virtual env 
+
+install virtual env 
+
+    pip install virtual env
+
+Bypass security auth for activate virtual env in powershell
+    
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
