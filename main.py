@@ -19,15 +19,15 @@ def partioning_data(df, test_size = 0.2):
     bayesian_data, kalman_data = train_test_split(df, test_size=test_size)
     return bayesian_data.values.tolist(), kalman_data.values.tolist()
 
-def KalmanProcess(signal, A=1, H=1, Q=1.6, R=6):
-    signal_kalman_filter = kalman_filter(signal, A=1, H=1, Q=1.6, R=6)
-    kalmanFilterData_label="kalman_filtered_signal"
+
 
 if __name__ == "__main__":
     # Step 1: Open the CSV file with a specified separator
     df, file_path = open_csv_file(separator=';')  # You can specify the separator you want
+    
 
     if df is not None:
+        kalmanFilterData_label="kalman_filtered_signal"
         file_name = os.path.basename(file_path)
         # Step 2: Count the number of columns in the opened CSV file
         num_columns = count_columns(df)
@@ -48,8 +48,19 @@ if __name__ == "__main__":
 
         bayesian_data, kalman_data = partioning_data(selected_data)
 
+        bayesian_data = [item for sublist in kalman_data for item in sublist]
+        kalman_data = [item for sublist in kalman_data for item in sublist]
+
         print("Bayesian Data (80%):", bayesian_data )
         print("kalman Data (20%):", kalman_data )
+
+        signal_kalman_filter = kalman_filter(kalman_data, A=1, H=1, Q=1.6, R=6)
+        signal_kalman_filter = [item[0] if isinstance(item, np.ndarray) else item for item in signal_kalman_filter]
+        print("filtered data:", signal_kalman_filter)
+
+
+        plot_signals([kalman_data, signal_kalman_filter], ["signal", kalmanFilterData_label])
+
     else:
         print("CSV file could not be opened.")
 # excel_file = "Pengujian Awal Wifi Tes F3.xlsx"
