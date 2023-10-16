@@ -11,8 +11,11 @@ Description: Brief description of the code's purpose
 """
 
 
-def select_data(df, coloumns):
-    return df[coloumns]
+def filter_data_by_column_name(df, keyword):
+    # Filter columns that contain the keyword
+    wifi_columns = [col for col in df.columns if keyword in col]
+    wifi_data = df[wifi_columns]
+    return wifi_data
 
 
 def partioning_data(df, test_size = 0.2):
@@ -42,24 +45,73 @@ if __name__ == "__main__":
         print("Modified CSV File Contents:")
         print(modified_df)
 
+        # Step 6 
+        rawData = []
+        for column_name in modified_df:
+            new_df = modified_df[[column_name]]
+            # Define the output file 
+            outputRawData = "newRawData/RAW_{0}.csv".format(column_name)
+            # save data 
+            # new_df.to_csv(outputRawData, index=False)
+            #     # Check if the output file already exists
+            try:
+            # Append the new data to the existing file
+                existing_df = pd.read_csv(outputRawData)
+                combined_df = pd.concat([existing_df, new_df], axis=1)
+                combined_df.to_csv(outputRawData, index=False, header= False)
+            except FileNotFoundError:
+                # If the file doesn't exist, create a new one
+                new_df.to_csv(outputRawData, index=False,header= False,)
+            combined_df = pd.read_csv(outputRawData, header= None)
+            rawData.extend(combined_df.values.ravel().tolist())
+        print(rawData)
 
-        selected_columns = input("Enter the column names (comma-separated) to select: ").split(',')
-        selected_data = modified_df.loc[:, selected_columns]
-
-        bayesian_data, kalman_data = partioning_data(selected_data)
-
-        bayesian_data = [item for sublist in kalman_data for item in sublist]
-        kalman_data = [item for sublist in kalman_data for item in sublist]
-
-        print("Bayesian Data (80%):", bayesian_data )
-        print("kalman Data (20%):", kalman_data )
-
-        signal_kalman_filter = kalman_filter(kalman_data, A=1, H=1, Q=1.6, R=6)
-        signal_kalman_filter = [item[0] if isinstance(item, np.ndarray) else item for item in signal_kalman_filter]
-        print("filtered data:", signal_kalman_filter)
+        # selected_data = filter_data_by_column_name(modified_df, keyword="Wifi")
+        # selected_columns = input("Enter the column names (comma-separated) to selet: ").split(',')
+        # selected_data = modified_df.loc[:, selected_columns]
 
 
-        plot_signals([kalman_data, signal_kalman_filter], ["signal", kalmanFilterData_label])
+# partioning data 
+
+        # bayesian_data, kalman_data = partioning_data(selected_data)
+
+        # flat_bayesian_data = [item for sublist in bayesian_data for item in sublist]
+        # flat_kalman_data = [item for sublist in kalman_data for item in sublist]
+
+        # print("Bayesian Data (80%):", flat_bayesian_data )
+        # print("kalman Data (20%):", flat_kalman_data )
+
+        # signal_kalman_filter = kalman_filter(kalman_data, A=1, H=1, Q=1.6, R=6)
+        # signal_kalman_filter = [item[0] if isinstance(item, np.ndarray) else item for item in signal_kalman_filter]
+        # flat_kalman_signal = [item for sublist in signal_kalman_filter for item in (sublist if isinstance(sublist, list) else [sublist])]
+        # print("filtered data:", flat_kalman_data)
+
+
+
+        # # Create a grid of x and y coordinates that match the data
+        # x_coordinates = np.arange(len(bayesian_data))
+        # y_coordinates = np.array([1])
+
+
+        # data_array = np.array([bayesian_data])
+
+        # # Create the heatmap
+        # plt.figure(figsize=(8, 2))  # Adjust the figsize as needed
+        # plt.imshow(data_array, cmap='viridis', origin='lower', aspect='auto')
+
+        # # Add labels and colorbar
+        # plt.xlabel('Time Step')
+        # plt.ylabel('Row')
+        # plt.title('Wi-Fi RSSI Heatmap')
+        # plt.colorbar(label='RSSI (dBm)')
+
+        # # Customize x and y axis labels based on your data
+        # plt.xticks(np.arange(len(x_coordinates)), x_coordinates)
+        # plt.yticks(np.arange(len(y_coordinates)), y_coordinates)
+
+        # # Show the plot
+        # plt.show()
+        # plot_signals([kalman_data, signal_kalman_filter], ["signal", kalmanFilterData_label])
 
     else:
         print("CSV file could not be opened.")
