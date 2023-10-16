@@ -46,8 +46,10 @@ if __name__ == "__main__":
         print(modified_df)
 
         # Step 6 
-        rawData = []
+        rawDataDict = "newRawData"
+        rawData = {}
         for column_name in modified_df:
+            # Create a new DataFrame with just the selected column
             new_df = modified_df[[column_name]]
             # Define the output file 
             outputRawData = "newRawData/RAW_{0}.csv".format(column_name)
@@ -56,15 +58,24 @@ if __name__ == "__main__":
             #     # Check if the output file already exists
             try:
             # Append the new data to the existing file
+                # Try to load the existing output file (if it exists)
                 existing_df = pd.read_csv(outputRawData)
+                # Append the new data to the existing file
                 combined_df = pd.concat([existing_df, new_df], axis=1)
-                combined_df.to_csv(outputRawData, index=False, header= False)
+                # Save the updated data without headers
+                combined_df.to_csv(outputRawData, index=False)
             except FileNotFoundError:
                 # If the file doesn't exist, create a new one
-                new_df.to_csv(outputRawData, index=False,header= False,)
-            combined_df = pd.read_csv(outputRawData, header= None)
-            rawData.extend(combined_df.values.ravel().tolist())
-        print(rawData)
+                new_df.to_csv(outputRawData, index=False)
+        for rawFileName in os.listdir(rawDataDict):
+            if rawFileName.endswith('.csv'):
+                column_name = os.path.splitext(rawFileName)[0]
+                raw_df = pd.read_csv(os.path.join(rawDataDict, rawFileName))
+                data_list = raw_df.values.ravel().tolist()
+                rawData[column_name] = data_list
+        for column_name, data_list in rawData.items():
+            print(f'Data for {column_name}: {data_list}')
+
 
         # selected_data = filter_data_by_column_name(modified_df, keyword="Wifi")
         # selected_columns = input("Enter the column names (comma-separated) to selet: ").split(',')
