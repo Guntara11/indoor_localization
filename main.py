@@ -60,7 +60,7 @@ if __name__ == "__main__":
         if not os.path.exists(rawDataDict):
             os.mkdir(rawDataDict)
         #Step 6 calculate max, mean, median from csv 
-        column_to_analyze = ['Wifi_A', 'Wifi_B', 'Wifi_C', 'Wifi_D']
+        column_to_analyze = ['Wifi_A', 'Wifi_B', 'Wifi_C', 'Wifi_D', 'Wifi_A_5G', 'Wifi_B_5G', 'Wifi_C_5G', 'Wifi_D_5G']
 
         # calculate and print mean, median, max 
         for column_name in column_to_analyze:
