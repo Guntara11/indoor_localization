@@ -25,8 +25,8 @@ def partioning_data(df, test_size = 0.2):
 def choose_output_folder(input_file_name):
     if "_a23" in input_file_name:
         return os.path.join(rawDataDict, "a23")
-    elif "_f23" in input_file_name:
-        return os.path.join(rawDataDict, "f23")
+    elif "_f3" in input_file_name:
+        return os.path.join(rawDataDict, "f3")
     else:
         # Default output folder if no match is found
         return "default_folder"
@@ -82,7 +82,7 @@ if __name__ == "__main__":
             # Define the output file names
             # rawData = os.path.join(rawDataDict, f'Raw_statData_{column_name}.csv')
             rawData_folder = choose_output_folder(os.path.basename(output_path))
-            print(rawData_folder)
+            print("rawdatafolder :",rawData_folder)
             # Check if the user canceled output folder selection
             if rawData_folder == "default_folder":
                 print(f"Output folder for '{output_path}' selection canceled or not matched.")
@@ -92,7 +92,7 @@ if __name__ == "__main__":
                 print(rawData)
 
                 # Append the statistics to the existing or new CSV file
-                utils.append_to_csv(rawData_folder, [stats], headers=['Column', 'Mean', 'Median', 'Maximum'])  
+                utils.append_to_csv(rawData, [stats], headers=['Column', 'Mean', 'Median', 'Maximum'])  
 
 
 
