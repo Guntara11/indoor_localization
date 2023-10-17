@@ -63,7 +63,51 @@ def count_columns(df):
     else:
         print("DataFrame is None; unable to count columns.")
         return None
+def calculate_statistics(df, column_name):
+    # Load your output CSV file
+    column_data = df[column_name]
+    mean_value = column_data.mean()
+    median_value = column_data.median()
+    max_value = column_data.max()
+    
+    return {
+        'Column': column_name,
+        'Mean': mean_value,
+        'Median': median_value,
+        'Maximum': max_value
+    }
 
+    # Calculate mean, median, and maximum for each column
+    results = {
+        'WIFI_A_mean': df['WIFI_A'].mean(),
+        'WIFI_B_mean': df['WIFI_B'].mean(),
+        'WIFI_C_mean': df['WIFI_C'].mean(),
+        'WIFI_D_mean': df['WIFI_D'].mean(),
+        'WIFI_A_median': df['WIFI_A'].median(),
+        'WIFI_B_median': df['WIFI_B'].median(),
+        'WIFI_C_median': df['WIFI_C'].median(),
+        'WIFI_D_median': df['WIFI_D'].median(),
+        'WIFI_A_max': df['WIFI_A'].max(),
+        'WIFI_B_max': df['WIFI_B'].max(),
+        'WIFI_C_max': df['WIFI_C'].max(),
+        'WIFI_D_max': df['WIFI_D'].max(),
+    }
+    return results
+    # Convert the results dictionary to a DataFrame
+    # results_df = pd.DataFrame([results])
+
+    # Save the results to a new CSV file
+    # results_df.to_csv(output_file, index=False) 
+def append_to_csv(file_path, data, headers=None):
+    # Append data to an existing CSV file or create a new one
+    if os.path.isfile(file_path):
+        existing_df = pd.read_csv(file_path)
+    else:
+        existing_df = pd.DataFrame(columns=headers)
+    
+    new_data = pd.DataFrame(data, columns=headers)
+    updated_df = pd.concat([existing_df, new_data], ignore_index=True)
+    updated_df.to_csv(file_path, index=False)
 def convert_xlxs_to_CSV(excel_file_path, sheetName, col, csv_file_path):
     """
     taking data in excel coloumn F sheet WiFI A

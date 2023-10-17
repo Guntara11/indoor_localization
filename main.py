@@ -22,6 +22,15 @@ def partioning_data(df, test_size = 0.2):
     bayesian_data, kalman_data = train_test_split(df, test_size=test_size)
     return bayesian_data.values.tolist(), kalman_data.values.tolist()
 
+def choose_output_folder(input_file_name):
+    if "_a23" in input_file_name:
+        return os.path.join(rawDataDict, "a23")
+    elif "_f23" in input_file_name:
+        return os.path.join(rawDataDict, "f23")
+    else:
+        # Default output folder if no match is found
+        return "default_folder"
+
 
 
 if __name__ == "__main__":
@@ -37,7 +46,7 @@ if __name__ == "__main__":
 
         print("CSV FILE : ",file_name)
         # Step 3 and Step 4: Modify the CSV file as needed
-        output_path = "newData/modified {0}.csv".format(file_name)
+        output_path = "newData/modified {0}".format(file_name)
         modify_csv(df, separator=',', output_path= output_path)  # Change the separator if needed
 
         # Step 5: Open the modified CSV using Pandas and print its content
@@ -45,36 +54,85 @@ if __name__ == "__main__":
         print("Modified CSV File Contents:")
         print(modified_df)
 
-        # Step 6 
         rawDataDict = "newRawData"
-        rawData = {}
-        for column_name in modified_df:
-            # Create a new DataFrame with just the selected column
-            new_df = modified_df[[column_name]]
-            # Define the output file 
-            outputRawData = "newRawData/RAW_{0}.csv".format(column_name)
-            # save data 
-            # new_df.to_csv(outputRawData, index=False)
-            #     # Check if the output file already exists
-            try:
-            # Append the new data to the existing file
-                # Try to load the existing output file (if it exists)
-                existing_df = pd.read_csv(outputRawData)
-                # Append the new data to the existing file
-                combined_df = pd.concat([existing_df, new_df], axis=1)
-                # Save the updated data without headers
-                combined_df.to_csv(outputRawData, index=False)
-            except FileNotFoundError:
-                # If the file doesn't exist, create a new one
-                new_df.to_csv(outputRawData, index=False)
-        for rawFileName in os.listdir(rawDataDict):
-            if rawFileName.endswith('.csv'):
-                column_name = os.path.splitext(rawFileName)[0]
-                raw_df = pd.read_csv(os.path.join(rawDataDict, rawFileName))
-                data_list = raw_df.values.ravel().tolist()
-                rawData[column_name] = data_list
-        for column_name, data_list in rawData.items():
-            print(f'Data for {column_name}: {data_list}')
+
+        # Create the folder if it doesn't exist
+        if not os.path.exists(rawDataDict):
+            os.mkdir(rawDataDict)
+        #Step 6 calculate max, mean, median from csv 
+        column_to_analyze = ['Wifi_A', 'Wifi_B', 'Wifi_C', 'Wifi_D']
+
+        # calculate and print mean, median, max 
+        for column_name in column_to_analyze:
+            stats =calculate_statistics(modified_df, column_name)
+            print(f"Column: {stats['Column']}")
+            print(f"Mean: {stats['Mean']}")
+            print(f"Median: {stats['Median']}")
+            print(f"Maximum: {stats['Maximum']}")
+            print()
+        
+            # Extract the statistics and column name
+            mean_value = stats['Mean']
+            median_value = stats['Median']
+            max_value = stats['Maximum']
+
+            # Create a new DataFrame for the statistics
+            stats_df = pd.DataFrame({'Column': [column_name], 'Mean': [mean_value], 'Median': [median_value], 'Maximum': [max_value]})
+
+            # Define the output file names
+            # rawData = os.path.join(rawDataDict, f'Raw_statData_{column_name}.csv')
+            rawData_folder = choose_output_folder(os.path.basename(output_path))
+            print(rawData_folder)
+            # Check if the user canceled output folder selection
+            if rawData_folder == "default_folder":
+                print(f"Output folder for '{output_path}' selection canceled or not matched.")
+            else:
+                print(f"Output folder for '{output_path}' selected: {rawData_folder}")
+                rawData = os.path.join(rawData_folder, f'Raw_statData_{column_name}.csv')
+                print(rawData)
+
+                # Append the statistics to the existing or new CSV file
+                utils.append_to_csv(rawData_folder, [stats], headers=['Column', 'Mean', 'Median', 'Maximum'])  
+
+
+
+
+            # Define the output file name
+            # output_Raw_file_name ="newRawData/RAW_{0}.csv".format(column_name)
+            # Save the statistics DataFrame to a new CSV file with the appropriate headers
+            # stats_df.to_csv(output_Raw_file_name, index=False)
+       
+        
+        # Step 6 
+        # rawDataDict = "newRawData"
+        # rawData = {}
+        # for column_name in modified_df:
+        #     # Create a new DataFrame with just the selected column
+        #     new_df = modified_df[[column_name]]
+        #     # Define the output file 
+        #     outputRawData = "newRawData/RAW_{0}.csv".format(column_name)
+        #     # save data 
+        #     # new_df.to_csv(outputRawData, index=False)
+        #     #     # Check if the output file already exists
+        #     try:
+        #     # Append the new data to the existing file
+        #         # Try to load the existing output file (if it exists)
+        #         existing_df = pd.read_csv(outputRawData)
+        #         # Append the new data to the existing file
+        #         combined_df = pd.concat([existing_df, new_df], axis=1)
+        #         # Save the updated data without headers
+        #         combined_df.to_csv(outputRawData, index=False)
+        #     except FileNotFoundError:
+        #         # If the file doesn't exist, create a new one
+        #         new_df.to_csv(outputRawData, index=False)
+        # for rawFileName in os.listdir(rawDataDict):
+        #     if rawFileName.endswith('.csv'):
+        #         column_name = os.path.splitext(rawFileName)[0]
+        #         raw_df = pd.read_csv(os.path.join(rawDataDict, rawFileName))
+        #         data_list = raw_df.values.ravel().tolist()
+        #         rawData[column_name] = data_list
+        # for column_name, data_list in rawData.items():
+        #     print(f'Data for {column_name}: {data_list}')
 
 
         # selected_data = filter_data_by_column_name(modified_df, keyword="Wifi")
