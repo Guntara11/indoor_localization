@@ -18,7 +18,7 @@ if os.path.exists(folder_path):
         if file_name.endswith('.csv'):
             file_path = os.path.join(folder_path, file_name)
             df = pd.read_csv(file_path, sep=';')
-            output_path = "newData/modified {0}".format(file_name)
+            output_path = "modifiedData_42titik/modified {0}".format(file_name)
 
             # if ("f3" in file_path):
             #     modify_csv(df, separator=';', output_path= output_path)

@@ -24,7 +24,8 @@ def open_csv_file(separator=','):
         try:
             # Read the CSV file with the specified separator
             df = pd.read_csv(file_path, sep=separator)
-            return df, file_path
+            nested_data = df[['Mean', 'Median','Maximum']].values.tolist()
+            return nested_data, file_path
         except Exception as e:
             print(f"An error occurred while reading the CSV file: {str(e)}")
             return None, None
