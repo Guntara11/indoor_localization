@@ -21,11 +21,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # # Data points and coordinates
-# data = [-50.55, -45.7, -40.8, -46.6, -46.25, -43.15, -46.1]
-# coordinates = [(0, 3), (1, 3), (2, 3), (3, 3), (4, 3), (5, 3), (6, 3)]
+# data = [-50.55, -45.7, -40.8, -46.6, -46.25, -43.15, -46.1, 
+#         -10.55, -25.7, -30.8, -46.6, -76.25, -13.15, -26.1]
+# coordinates = [(0, 1), (1, 1), (2, 1), (3, 1), (4, 1), (5, 1), (6, 1),
+#                (0, 2), (1, 2), (2, 2), (3, 2), (4, 2), (5, 2), (6, 2), 
+#                (0, 3), (1, 3), (2, 3), (3, 3), (4, 3), (5, 3), (6, 3)]
 
 # # Create a 2D grid for the heatmap
-# heatmap = np.zeros((7, 4))  # Assuming 7 rows and 4 columns
+# heatmap = np.zeros((7, 3))  # Assuming 7 rows and 4 columns
 
 # # Populate the grid with data at the specified coordinates
 # for (x, y), value in zip(coordinates, data):
@@ -80,21 +83,41 @@ hapus bagian data
 #     sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap="coolwarm", xticklabels=range(1, 8), yticklabels=range(1, 5))
 #     plt.title("Correlation Heatmap")
 #     plt.show()
+#################################################### part untuk di hapus atau di comment aja ################################################################
+"""
+SESUAIKAN AXIS X DAN Y SESUAI BANYAK NYA KOORDINATE YANG TERCANTUM DI FILE MODIFY 
+CONTOH (0,1) ADALAH X = 0 DAN Y =1 
+"""
+##############################################################################################################################################################
 
-# if __name__ == "__main__":
-#     nested_data, file_path = open_csv_file(separator=',')
+if __name__ == "__main__":
+    nested_data, file_path = open_csv_file(separator=',')
     
-#     if nested_data:
-#         # Process and work with the nested_data as needed in your main script
-#         print("Data from CSV file:")
-#         for row in nested_data:
-#             print(row)
-#         print(nested_data)
-#         make_visualization(nested_data)
+    if nested_data:
+        # Process and work with the nested_data as needed in your main script
+        print("Data from CSV file:")
+        for row in nested_data:
+            print(row)
+        Mean_data = first_items = [sublist[0] for sublist in nested_data]
+        print(Mean_data)
+        # make_visualization(nested_data)
+        y_coordinates = [3] * len(Mean_data)
 
+        # Create X-coordinates for the data points (0 to 6)
+        x_coordinates = list(range(len(Mean_data)))
 
-#     else:
-#         print("Data not loaded due to an error or no file selected.")
+        # Create a heatmap using matplotlib
+        plt.scatter(x_coordinates, y_coordinates, c=first_items, cmap='YlGnBu', s=200)
+        plt.colorbar(label='Values')
+        plt.title('Heatmap of First Items')
+        plt.xlabel('X-axis')
+        plt.ylabel('Y-axis')
+
+        # Show the plot
+        plt.show()
+
+    else:
+        print("Data not loaded due to an error or no file selected.")
 
 # excel_file = "Pengujian Awal Wifi Tes F3.xlsx"
 # sheetName = "WiFI A"
