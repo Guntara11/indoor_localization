@@ -98,20 +98,33 @@ if __name__ == "__main__":
         print("Data from CSV file:")
         for row in nested_data:
             print(row)
-        Mean_data = first_items = [sublist[0] for sublist in nested_data]
+        Mean_data = first_items = [sublist[0] for sublist in nested_data] 
         print(Mean_data)
-        # make_visualization(nested_data)
-        y_coordinates = [3] * len(Mean_data)
 
-        # Create X-coordinates for the data points (0 to 6)
-        x_coordinates = list(range(len(Mean_data)))
+        ## make_visualization(nested_data)//untuk 7 titik
+        # y_coordinates =  [3] * len(Mean_data) 
 
+        ## Create X-coordinates for the data points (0 to 6)
+        # x_coordinates = list(range(len(Mean_data)))
+
+        # Create X-coordinates and Y-Coordinate Use 42 point//untuk 42 titik
+        num_columns = 7
+        num_rows = len(Mean_data) // num_columns
+
+        # Define x and y coordinates for the 42 data points in a grid
+        x_coordinates = [i % num_columns for i in range(len(Mean_data))]
+        y_coordinates = [i // num_columns for i in range(len(Mean_data))]
+        
         # Create a heatmap using matplotlib
         plt.scatter(x_coordinates, y_coordinates, c=first_items, cmap='YlGnBu', s=200)
         plt.colorbar(label='Values')
         plt.title('Heatmap of First Items')
         plt.xlabel('X-axis')
         plt.ylabel('Y-axis')
+        
+        # Annotate the heatmap with Median values//untuk mengetahui nilai yang ada di heatmap
+        # for i, median_value in enumerate(Median_data):
+        #     plt.annotate(str(median_value), (x_coordinates[i], y_coordinates[i]), color='black', fontsize=10, ha='center', va='center')
 
         # Show the plot
         plt.show()

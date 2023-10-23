@@ -4,11 +4,11 @@ import utils
 from utils import *
 
 
-folder_path = filedialog.askdirectory()
 
 root = tk.Tk()
 root.withdraw()  # Hide the main tkinter window
 
+folder_path = filedialog.askdirectory()
 if os.path.exists(folder_path):
     # List all files in the folder
     file_list = os.listdir(folder_path)
