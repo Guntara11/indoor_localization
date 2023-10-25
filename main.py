@@ -91,46 +91,101 @@ CONTOH (0,1) ADALAH X = 0 DAN Y =1
 ##############################################################################################################################################################
 
 if __name__ == "__main__":
-    nested_data, file_path = open_csv_file(separator=',')
+    root = tk.Tk()
+    root.withdraw()  # Hide the main tkinter window
+
+    data_dict = {}  # Store data for different Wi-Fi networks
+    wifi_name_list = []  # Store Wi-Fi network names
+
+    folder_path = filedialog.askdirectory()
+    if os.path.exists(folder_path):
+        file_list = os.listdir(folder_path)
+        for file_name in file_list:
+            file_name = os.path.join(folder_path, file_name)
+            df = pd.read_csv(file_name, sep=',')
+            wifi_name = df.loc[0, 'Column']
+
+            if wifi_name not in data_dict:
+                data_dict[wifi_name] = {'Mean': [], 'Median': [], 'Max': []}  # Initialize lists for the Wi-Fi network
+
+            nested_data = df[['Mean', 'Median', 'Maximum']].values.tolist()
+            data_dict[wifi_name]['Mean'].append([sublist[0] for sublist in nested_data])
+            data_dict[wifi_name]['Median'].append([sublist[1] for sublist in nested_data])
+            data_dict[wifi_name]['Max'].append([sublist[2] for sublist in nested_data])
+            wifi_name_list.append(wifi_name)
+
+    # # make_visualization(nested_data)//untuk 7 titik
+    # y_coordinates =  [3] * len(data_dict[wifi_name_list[0]]['Mean'][0]) 
+    # # Create X-coordinates for the data points (0 to 6)
+    # x_coordinates = list(range(len(data_dict[wifi_name_list[0]]['Mean'][0])))
+
+    # Create X-coordinates and Y-Coordinates for 42 points
+    num_columns = 7  
+
+    x_coordinates = [i % num_columns for i in range(len(data_dict[wifi_name_list[0]]['Mean'][0]))]
+    y_coordinates = [i // num_columns for i in range(len(data_dict[wifi_name_list[0]]['Mean'][0]))]
     
-    if nested_data:
-        # Process and work with the nested_data as needed in your main script
-        print("Data from CSV file:")
-        for row in nested_data:
-            print(row)
-        Mean_data = first_items = [sublist[0] for sublist in nested_data] 
-        print(Mean_data)
+    num_plots = len(wifi_name_list)
+    cols = num_plots
+    rows = 3
 
-        ## make_visualization(nested_data)//untuk 7 titik
-        # y_coordinates =  [3] * len(Mean_data) 
+    fig, axes = plt.subplots(rows, cols, figsize=(16, 10), gridspec_kw={'wspace': 0.5, 'hspace': 0.5})
 
-        ## Create X-coordinates for the data points (0 to 6)
-        # x_coordinates = list(range(len(Mean_data)))
+    for i, wifi_name in enumerate(wifi_name_list):
+        for j, metric in enumerate(['Mean', 'Median', 'Max']):
+            data_matrix = data_dict[wifi_name][metric]
 
-        # Create X-coordinates and Y-Coordinate Use 42 point//untuk 42 titik
-        num_columns = 7
-        num_rows = len(Mean_data) // num_columns
+            ax = axes[j, i]
+            im = ax.scatter(x_coordinates, y_coordinates, c=data_matrix, cmap='YlGnBu', s=100, marker='s')  # Use 's' for square markers
+            ax.set_aspect('equal',adjustable='box')
+            ax.set_title(f'{metric}\n {wifi_name}')
+            # ax.set_xlabel('X-axis')
+            # ax.set_ylabel('Y-axis')
 
-        # Define x and y coordinates for the 42 data points in a grid
-        x_coordinates = [i % num_columns for i in range(len(Mean_data))]
-        y_coordinates = [i // num_columns for i in range(len(Mean_data))]
-        
-        # Create a heatmap using matplotlib
-        plt.scatter(x_coordinates, y_coordinates, c=first_items, cmap='YlGnBu', s=200)
-        plt.colorbar(label='Values')
-        plt.title('Heatmap of First Items')
-        plt.xlabel('X-axis')
-        plt.ylabel('Y-axis')
-        
-        # Annotate the heatmap with Median values//untuk mengetahui nilai yang ada di heatmap
-        # for i, median_value in enumerate(Median_data):
-        #     plt.annotate(str(median_value), (x_coordinates[i], y_coordinates[i]), color='black', fontsize=10, ha='center', va='center')
+    # Create the colorbar and specify the axes to use
+    cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])  # [x, y, width, height]
+    cbar = fig.colorbar(im, cax=cbar_ax, label='Values')
+    plt.show()
 
-        # Show the plot
-        plt.show()
 
-    else:
-        print("Data not loaded due to an error or no file selected.")
+    # if nested_data:
+    #         # Process and work with the nested_data as needed in your main script
+    #         print("Data from CSV file:")
+    #         for row in nested_data:
+    #             print(row)
+    #         Mean_data = first_items = [sublist[0] for sublist in nested_data] 
+    #         print(Mean_data)
+
+    #         ## make_visualization(nested_data)//untuk 7 titik
+    #         # y_coordinates =  [3] * len(Mean_data) 
+
+    #         ## Create X-coordinates for the data points (0 to 6)
+    #         # x_coordinates = list(range(len(Mean_data)))
+
+    #         # Create X-coordinates and Y-Coordinate Use 42 point//untuk 42 titik
+    #         num_columns = 7
+    #         num_rows = len(Mean_data) // num_columns
+
+    #         # Define x and y coordinates for the 42 data points in a grid
+    #         x_coordinates = [i % num_columns for i in range(len(Mean_data))]
+    #         y_coordinates = [i // num_columns for i in range(len(Mean_data))]
+            
+    #         # Create a heatmap using matplotlib
+    #         plt.scatter(x_coordinates, y_coordinates, c=first_items, cmap='YlGnBu', s=200)
+    #         plt.colorbar(label='Values')
+    #         plt.title('Heatmap of First Items')
+    #         plt.xlabel('X-axis')
+    #         plt.ylabel('Y-axis')
+            
+    #         # Annotate the heatmap with Median values//untuk mengetahui nilai yang ada di heatmap
+    #         # for i, median_value in enumerate(Median_data):
+    #         #     plt.annotate(str(median_value), (x_coordinates[i], y_coordinates[i]), color='black', fontsize=10, ha='center', va='center')
+
+    #         # Show the plot
+    #         plt.show()
+
+    #     else:
+    #         print("Data not loaded due to an error or no file selected.")
 
 # excel_file = "Pengujian Awal Wifi Tes F3.xlsx"
 # sheetName = "WiFI A"
@@ -166,10 +221,3 @@ if __name__ == "__main__":
 
 # plot_signals([signal,signal_kalman_filter, signal_gray_filter, signal_fft_filter],
 #              ["signal", kalmanFilterData_label, grayFilterData_label, fftFilterData_label]) 
-            
-
-
-
-
-
-
