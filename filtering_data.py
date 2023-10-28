@@ -7,25 +7,31 @@ from tkinter import filedialog
 from utils import kalman_block, kalman_filter, calculate_statistics
 
 
-def choose_output_folder(input_file_name, filterDataDict):
-        if "_a23" in input_file_name:
-            return os.path.join(filterDataDict, "a23")
-        elif "_f3" in input_file_name:
-            return os.path.join(filterDataDict, "f3")
-        else:
-            # Default output folder if no match is found
-            return "default_folder"
+# def choose_output_folder(input_file_name, filterDataDict):
+#         if "_a23" in input_file_name:
+#             return os.path.join(filterDataDict, "a23")
+#         elif "_f3" in input_file_name:
+#             return os.path.join(filterDataDict, "f3")
+#         else:
+#             # Default output folder if no match is found
+#             return "default_folder"
 def main() :  
     folder_path = filedialog.askdirectory()
-    if os.path.exists(folder_path):
-        # List all files in the folder
-        file_list = os.listdir(folder_path)
-
+    # if os.path.exists(folder_path):
+    #     # List all files in the folder
+    #     file_list = os.listdir(folder_path)
+    if folder_path:
         # Iterate through the files in the folder
-        for file_name in file_list:
+        for file_name in os.listdir(folder_path):
+            file_path = os.path.join(folder_path, file_name)
+
             if file_name.endswith('.csv'):
-                file_path = os.path.join(folder_path, file_name)
-                df = pd.read_csv(file_path, sep=';')
+                df = pd.read_csv(file_path, sep=',')
+        # Iterate through the files in the folder
+        # for file_name in file_path:
+        #     if file_name.endswith('.csv'):
+        #         file_path = os.path.join(folder_path, file_name)
+        #         df = pd.read_csv(file_path, sep=';')
 
                 output_path = os.path.join(folder_path, file_path)
 
@@ -33,14 +39,11 @@ def main() :
                 print("Modified CSV File Contents:")
                 print(modified_df)
 
-                filterDataDict = "filteredData_42titik "
-
-                # Create the folder if it doesn't exist
-                if not os.path.exists(filterDataDict):
-                    os.mkdir(filterDataDict)
-
                 #Step 6 calculate max, mean, median from csv 
                 column_to_analyze = ['Wifi_A', 'Wifi_B', 'Wifi_C', 'Wifi_D', 'Wifi_A_5G', 'Wifi_B_5G', 'Wifi_C_5G', 'Wifi_D_5G']
+
+                 # Dictionary to store filtered data for each WiFi
+                filtered_data = {}
 
                 for column_name in column_to_analyze:
                     signal = modified_df[column_name].tolist()
@@ -48,10 +51,29 @@ def main() :
                     signal_kalman_filter = kalman_filter(signal, A=1, H=1, Q=1.6, R=6)
                     # remove "array" in data
                     signal_kalman_filter = [item[0] if isinstance(item, np.ndarray) else item for item in signal_kalman_filter]
+                    filtered_data[column_name] = signal_kalman_filter
                     # print("signal filtered for {0} : {1} ".format(column_name, signal_kalman_filter))
                     dfFilter = pd.DataFrame(signal_kalman_filter)
                     print("signal filtered for {0} : {1} ".format(column_name, dfFilter))
                     #define output folder for filtered data 
+                
+                # Create a DataFrame to store filtered data
+                filtered_df = pd.DataFrame(filtered_data)
+                
+                # Create a folder 'filtered_output' if it doesn't exist
+                output_folder = 'filteredData_42titik'
+                if not os.path.exists(output_folder):
+                    os.mkdir(output_folder)
+
+                # Extract file name without extension
+                file_name_without_ext = os.path.splitext(file_name)[0]
+
+                # Save the filtered data to a CSV file in 'filtered_output' folder
+                output_file_path = os.path.join(output_folder, f"{file_name_without_ext}_filtered.csv")
+                filtered_df.to_csv(output_file_path, index=False)
+
+                print(f"Filtered data from {file_name} saved to: {output_file_path}")
+                
                 # # calculate and print mean, median, max 
                 # for column_name in column_to_analyze:
                 #     stats =calculate_statistics(modified_df, column_name)

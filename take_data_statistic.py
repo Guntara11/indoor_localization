@@ -6,7 +6,7 @@ from utils import *
 def choose_output_folder(input_file_name, rawDataDict):
         if "_a23" in input_file_name:
             return os.path.join(rawDataDict, "a23")
-        elif "_f3" in input_file_name:
+        elif "_f3" or "F3" or "f23" in input_file_name:
             return os.path.join(rawDataDict, "f3")
         else:
             # Default output folder if no match is found
@@ -31,7 +31,7 @@ def main() :
                 print("Modified CSV File Contents:")
                 print(modified_df)
 
-                rawDataDict = "rawData_42titik "
+                rawDataDict = "rawData_42titik_filterData"
 
                 # Create the folder if it doesn't exist
                 if not os.path.exists(rawDataDict):
