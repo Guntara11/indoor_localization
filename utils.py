@@ -1,5 +1,6 @@
 import os 
 import pandas as pd
+import math
 import matplotlib.pyplot as plt 
 import numpy as np
 import tkinter as tk 
@@ -184,6 +185,22 @@ def plot_signals(signals, labels):
     plt.show()
 
     return
+def bayesian_likelihood_function(distance, standard_deviation):
+    return math.exp(-(distance ** 2) / (2 * standard_deviation ** 2))
+
+def hist_gauss(values):
+    val = sorted(values[values!=-100.0])
+    x = range(-100, -10)
+    mu = np.mean(val)
+    sigma = np.std(val)
+    if np.isnan(mu) and np.isnan(sigma):
+        y = [0]*len(x)
+    elif mu==0 or sigma==0:
+        y = [0]*len(x)
+    else:
+        y = (1 / (np.sqrt(2 * np.pi * np.power(sigma, 2)))) * \
+        (np.power(np.e, -(np.power((x - mu), 2) / (2 * np.power(sigma, 2)))))
+    return y
 
 def kalman_block(x, P, s, A, H, Q, R):
 
