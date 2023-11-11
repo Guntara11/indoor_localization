@@ -8,6 +8,7 @@ from utils import *
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import BayesianRidge
 from sklearn.metrics import mean_squared_error
+from sklearn.preprocessing import MinMaxScaler
 
 def partition_data(df, num_partitions=5):
     partioned_data = []
@@ -23,6 +24,9 @@ def plot_histogram(gaussian_histogram, title):
 
 def euclidean_distance(point1, point2):
     return distance.euclidean(point1, point2)
+
+def rmse(predictions, targets):
+    return np.sqrt(np.mean((predictions - targets) ** 2))
 
 #memindahkan ke folder partition
 def split_data (dataset_split_path, dataset_file, dataset_file_origin):
@@ -149,6 +153,11 @@ if __name__ == "__main__":
     train_data = pd.read_csv("train_modified (0,1)_a23 - 08-08-2023 14-10-13.csv_partition_1.csv")
     test_dataset = pd.read_csv("test_modified (0,1)_a23 - 08-08-2023 14-10-13.csv_partition_1.csv")
 
+    scaler = MinMaxScaler()
+    test_dataset[["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]] = scaler.fit_transform(test_dataset[["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]])
+    print("Specific Test Data (After Scaling):")
+    print(test_dataset)
+
     # Specify the columns for Bayesian estimation
     stat_data = pd.read_csv("Raw_statData_Wifi_A.csv")
     centers = stat_data[["Mean", "Median", "Maximum"]].values
@@ -167,19 +176,37 @@ if __name__ == "__main__":
         distances_maximum.append(euclidean_distance(test_column, maximum))
 
 
+    # print(mean)
+    # print(median)
+    # print(maximum)
+    # print(test_dataset)
     print(f"Euclidean Distances for Partition {i} (WiFi_A, WiFi_B, WiFi_C, WiFi_D):")
     print("Mean Distance:", distances_mean)
     print("Median Distance:", distances_median)
     print("Maximum Distance:", distances_maximum)
-    standard_deviation = 1.0  # Adjust the standard deviation as needed
-    probabilities_mean = [bayesian_likelihood_function(distance, standard_deviation) for distance in distances_mean]
-    probabilities_median = [bayesian_likelihood_function(distance, standard_deviation) for distance in distances_median]
-    probabilities_maximum = [bayesian_likelihood_function(distance, standard_deviation) for distance in distances_maximum]
 
-    print("Probabilities (WiFi_A, WiFi_B, WiFi_C, WiFi_D):")
-    print("Mean Probability:", probabilities_mean)
-    print("Median Probability:", probabilities_median)
-    print("Maximum Probability:", probabilities_maximum)
+    
+#   # Calculate RMSE between test_data and first Mean, Median, and Maximum for each column
+#        # Calculate RMSE between test_data and first Mean, Median, and Maximum for each column
+    # rmse_mean = [rmse(test_dataset[column], np.full(len(test_dataset), mean)) for column in ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]]
+    # rmse_median = [rmse(test_dataset[column], np.full(len(test_dataset), median)) for column in ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]]
+    # rmse_maximum = [rmse(test_dataset[column], np.full(len(test_dataset), maximum)) for column in ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]]
+
+
+
+    # print("RMSE:")
+    # print("Mean RMSE:", rmse_mean)
+    # print("Median RMSE:", rmse_median)
+    # print("Maximum RMSE:", rmse_maximum)
+    # standard_deviation = 1.0  # Adjust the standard deviation as needed
+    # probabilities_mean = [bayesian_likelihood_function(distance, standard_deviation) for distance in distances_mean]
+    # probabilities_median = [bayesian_likelihood_function(distance, standard_deviation) for distance in distances_median]
+    # probabilities_maximum = [bayesian_likelihood_function(distance, standard_deviation) for distance in distances_maximum]
+
+    # print("Probabilities (WiFi_A, WiFi_B, WiFi_C, WiFi_D):")
+    # print("Mean Probability:", probabilities_mean)
+    # print("Median Probability:", probabilities_median)
+    # print("Maximum Probability:", probabilities_maximum)
 
 
 
