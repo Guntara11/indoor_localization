@@ -20,7 +20,7 @@ def main():
                 df = pd.read_csv(file_path, sep=';')
                 output_path_a23 = "modifiedData_42titik/a23/modified {0}".format(file_name)
                 output_path_f3 = "modifiedData_42titik/f3/modified {0}".format(file_name)
-                if ("_f3" in file_path):
+                if ("_f3" in file_path or "_f23" in file_path or "_F3" in file_path):
                     modify_csv(df, separator=';', output_path= output_path_f3)
                 elif("_a23" in file_path):
                     modify_csv(df, separator=',', output_path= output_path_a23)

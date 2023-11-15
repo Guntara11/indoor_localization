@@ -31,7 +31,7 @@ def main() :
                 print("Modified CSV File Contents:")
                 print(modified_df)
 
-                rawDataDict = "rawData_42titik_filterData"
+                rawDataDict = "rawData_42titik_new"
 
                 # Create the folder if it doesn't exist
                 if not os.path.exists(rawDataDict):
