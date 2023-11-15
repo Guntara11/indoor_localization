@@ -4,7 +4,7 @@ import csv as commaSeparatedValues
 
 # Inisiasi variabel-variabel
 dataSource = "Alba"
-baseDirectory = r'D:\Universitas_Gadjah_Mada\Akademis--TIF_2018\Capstone\Data\Raw' + '\\'
+baseDirectory = r'C:\Users\asus\Documents\project_ega\freelance\Indoor Localization\Raw' + '\\'
 trainingRatio = 0.8
 trainingLength = int(trainingRatio*200)
 distanceOrder = 2

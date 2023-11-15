@@ -151,6 +151,16 @@ def convert_xlxs_to_CSV(excel_file_path, sheetName, col, csv_file_path):
     selectedData.insert(0, 'ID', range(1, len(selectedData) + 1))
     selectedData.to_csv(csv_file_path, index= False)
 
+def choose_output_folder(input_file_name, rawDataDict):
+        if "_a23" in input_file_name:
+            return os.path.join(rawDataDict, "a23")
+        elif "_f3" or "F3" or "f23" in input_file_name:
+            return os.path.join(rawDataDict, "f3")
+        else:
+            # Default output folder if no match is found
+            return "default_folder"
+
+
 def plot_signals(signals, labels):
 
     """
