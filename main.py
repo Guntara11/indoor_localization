@@ -93,60 +93,110 @@ CONTOH (0,1) ADALAH X = 0 DAN Y =1
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    root.withdraw()  # Hide the main tkinter window
+    # root = tk.Tk()
+    # root.withdraw()  # Hide the main tkinter window
 
-    data_dict = {}  # Store data for different Wi-Fi networks
-    wifi_name_list = []  # Store Wi-Fi network names
+    # data_dict = {}  # Store data for different Wi-Fi networks
+    # wifi_name_list = []  # Store Wi-Fi network names
 
-    folder_path = filedialog.askdirectory()
-    if os.path.exists(folder_path):
-        file_list = os.listdir(folder_path)
-        for file_name in file_list:
-            file_name = os.path.join(folder_path, file_name)
-            df = pd.read_csv(file_name, sep=',')
-            wifi_name = df.loc[0, 'Column']
+    # folder_path = filedialog.askdirectory()
+    # if os.path.exists(folder_path):
+    #     file_list = os.listdir(folder_path)
+    #     for file_name in file_list:
+    #         file_name = os.path.join(folder_path, file_name)
+    #         df = pd.read_csv(file_name, sep=',')
+    #         wifi_name = df.loc[0, 'Column']
 
-            if wifi_name not in data_dict:
-                data_dict[wifi_name] = {'Mean': [], 'Median': [], 'Max': []}  # Initialize lists for the Wi-Fi network
+    #         if wifi_name not in data_dict:
+    #             data_dict[wifi_name] = {'Mean': [], 'Median': [], 'Max': []}  # Initialize lists for the Wi-Fi network
 
-            nested_data = df[['Mean', 'Median', 'Maximum']].values.tolist()
-            data_dict[wifi_name]['Mean'].append([sublist[0] for sublist in nested_data])
-            data_dict[wifi_name]['Median'].append([sublist[1] for sublist in nested_data])
-            data_dict[wifi_name]['Max'].append([sublist[2] for sublist in nested_data])
-            wifi_name_list.append(wifi_name)
+    #         nested_data = df[['Mean', 'Median', 'Maximum']].values.tolist()
+    #         data_dict[wifi_name]['Mean'].append([sublist[0] for sublist in nested_data])
+    #         data_dict[wifi_name]['Median'].append([sublist[1] for sublist in nested_data])
+    #         data_dict[wifi_name]['Max'].append([sublist[2] for sublist in nested_data])
+    #         wifi_name_list.append(wifi_name)
 
-    # # make_visualization(nested_data)//untuk 7 titik
-    # y_coordinates =  [3] * len(data_dict[wifi_name_list[0]]['Mean'][0]) 
-    # # Create X-coordinates for the data points (0 to 6)
-    # x_coordinates = list(range(len(data_dict[wifi_name_list[0]]['Mean'][0])))
+    # # # make_visualization(nested_data)//untuk 7 titik
+    # # y_coordinates =  [3] * len(data_dict[wifi_name_list[0]]['Mean'][0]) 
+    # # # Create X-coordinates for the data points (0 to 6)
+    # # x_coordinates = list(range(len(data_dict[wifi_name_list[0]]['Mean'][0])))
+
+    # # Create X-coordinates and Y-Coordinates for 42 points
+    # num_columns = 7  
+
+    # x_coordinates = [i % num_columns for i in range(len(data_dict[wifi_name_list[0]]['Mean'][0]))]
+    # y_coordinates = [i // num_columns for i in range(len(data_dict[wifi_name_list[0]]['Mean'][0]))]
+    
+    # num_plots = len(wifi_name_list)
+    # cols = num_plots
+    # rows = 3
+
+    # fig, axes = plt.subplots(rows, cols, figsize=(16, 10), gridspec_kw={'wspace': 0.5, 'hspace': 0.5})
+
+    # for i, wifi_name in enumerate(wifi_name_list):
+    #     for j, metric in enumerate(['Mean', 'Median', 'Max']):
+    #         data_matrix = data_dict[wifi_name][metric]
+
+    #         ax = axes[j, i]
+    #         im = ax.scatter(x_coordinates, y_coordinates, c=data_matrix, cmap='YlGnBu', s=100, marker='s')  # Use 's' for square markers
+    #         ax.set_aspect('equal',adjustable='box')
+    #         ax.set_title(f'{metric}\n {wifi_name}')
+    #         # ax.set_xlabel('X-axis')
+    #         # ax.set_ylabel('Y-axis')
+
+    # # Create the colorbar and specify the axes to use
+    # cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])  # [x, y, width, height]
+    # cbar = fig.colorbar(im, cax=cbar_ax, label='Values')
+    # plt.show()
+
+    # Membaca file CSV
+    df = pd.read_csv('centering_data_raw\max_results.csv')
+
+    # Menentukan jumlah baris pada kolom lain sebagai referensi
+    jumlah_baris = len(df['x'])
+
+    # Menambahkan kolom "Max" dengan nilai "Max" sebanyak jumlah baris pada kolom lain
+    df.insert(0, 'Max', ['Max'] * jumlah_baris)
+
+    print(df)
+
+    # Gantikan nilai 'Max' dengan NaN
+    df.replace('Max', np.nan, inplace=True)
+
+    # Ubah dataframe menjadi tipe data float dan isi NaN dengan nilai yang sesuai
+    calc_data = df.astype(float).fillna(np.nan)
+
+    # Menentukan kolom yang akan digunakan untuk heatmap (menghapus kolom 'x' dan 'y')
+    heatmap_data = calc_data.drop(['x', 'y'], axis=1)
 
     # Create X-coordinates and Y-Coordinates for 42 points
-    num_columns = 7  
+    num_columns = 7
 
-    x_coordinates = [i % num_columns for i in range(len(data_dict[wifi_name_list[0]]['Mean'][0]))]
-    y_coordinates = [i // num_columns for i in range(len(data_dict[wifi_name_list[0]]['Mean'][0]))]
-    
-    num_plots = len(wifi_name_list)
+    x_coordinates = [i % num_columns for i in range(len(df['Max']))]
+    y_coordinates = [i // num_columns for i in range(len(df['Max']))]
+
+    #Membuat plot Heatmap
+    num_plots = len(df.columns) - 2  # Exclude 'x' and 'y'
     cols = num_plots
-    rows = 3
+    rows = 1
 
     fig, axes = plt.subplots(rows, cols, figsize=(16, 10), gridspec_kw={'wspace': 0.5, 'hspace': 0.5})
 
-    for i, wifi_name in enumerate(wifi_name_list):
-        for j, metric in enumerate(['Mean', 'Median', 'Max']):
-            data_matrix = data_dict[wifi_name][metric]
+    for i, column in enumerate(df.columns[3:]):  # Exclude 'x' and 'y'
+        for j, metric in enumerate(['Max']):
+            data_matrix = calc_data[column]
 
-            ax = axes[j, i]
+            ax = axes[i]
             im = ax.scatter(x_coordinates, y_coordinates, c=data_matrix, cmap='YlGnBu', s=100, marker='s')  # Use 's' for square markers
-            ax.set_aspect('equal',adjustable='box')
-            ax.set_title(f'{metric}\n {wifi_name}')
-            # ax.set_xlabel('X-axis')
-            # ax.set_ylabel('Y-axis')
+            ax.set_aspect('equal', adjustable='box')
+            ax.set_title(f'{metric}\n {column}')
+            ax.set_xlabel('X-axis')
+            ax.set_ylabel('Y-axis')
 
     # Create the colorbar and specify the axes to use
     cbar_ax = fig.add_axes([0.92, 0.15, 0.02, 0.7])  # [x, y, width, height]
     cbar = fig.colorbar(im, cax=cbar_ax, label='Values')
+
     plt.show()
 
 
