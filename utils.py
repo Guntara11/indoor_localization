@@ -6,6 +6,7 @@ import numpy as np
 import tkinter as tk 
 from tkinter import filedialog
 import csv 
+from scipy.spatial import distance
 """
 '''
 Author: Ega Guntara
@@ -65,48 +66,85 @@ def count_columns(df):
     else:
         print("DataFrame is None; unable to count columns.")
         return None
-def calculate_statistics(df, column_name):
-    # Load your output CSV file
-    column_data = df[column_name]
-    mean_value = column_data.mean()
-    median_value = column_data.median()
-    max_value = column_data.max()
+# def calculate_statistics(df, column_name):
+#     # Load your output CSV file
+#     column_data = df[column_name]
+#     mean_value = column_data.mean()
+#     median_value = column_data.median()
+#     max_value = column_data.max()
     
-    return {
-        'Column': column_name,
-        'Mean': mean_value,
-        'Median': median_value,
-        'Maximum': max_value
-    }
+#     return {
+#         'Column': column_name,
+#         'Mean': mean_value,
+#         'Median': median_value,
+#         'Maximum': max_value
+#     }
 
-    # Calculate mean, median, and maximum for each column
-    results = {
-        'WIFI_A_mean': df['WIFI_A'].mean(),
-        'WIFI_B_mean': df['WIFI_B'].mean(),
-        'WIFI_C_mean': df['WIFI_C'].mean(),
-        'WIFI_D_mean': df['WIFI_D'].mean(),
-        'WIFI_A_5G_mean': df['WIFI_A_5G'].mean(),
-        'WIFI_B_5G_mean': df['WIFI_B_5G'].mean(),
-        'WIFI_C_5G_mean': df['WIFI_C_5G'].mean(),
-        'WIFI_D_5G_mean': df['WIFI_D_5G'].mean(),
-        'WIFI_A_median': df['WIFI_A'].median(),
-        'WIFI_B_median': df['WIFI_B'].median(),
-        'WIFI_C_median': df['WIFI_C'].median(),
-        'WIFI_D_median': df['WIFI_D'].median(),
-        'WIFI_A_5G_median': df['WIFI_A_5G'].median(),
-        'WIFI_B_5G_median': df['WIFI_B_5G'].median(),
-        'WIFI_C_5G_median': df['WIFI_C_5G'].median(),
-        'WIFI_D_5G_median': df['WIFI_D_5G'].median(),
-        'WIFI_A_max': df['WIFI_A'].max(),
-        'WIFI_B_max': df['WIFI_B'].max(),
-        'WIFI_C_max': df['WIFI_C'].max(),
-        'WIFI_D_max': df['WIFI_D'].max(),
-        'WIFI_A_5G_max': df['WIFI_A_5G'].max(),
-        'WIFI_B_5G_max': df['WIFI_B_5G'].max(),
-        'WIFI_C_5G_max': df['WIFI_C_5G'].max(),
-        'WIFI_D_5G_max': df['WIFI_D_5G'].max(),
-    }
-    return results
+#     # Calculate mean, median, and maximum for each column
+#     results = {
+#         'WIFI_A_mean': df['WIFI_A'].mean(),
+#         'WIFI_B_mean': df['WIFI_B'].mean(),
+#         'WIFI_C_mean': df['WIFI_C'].mean(),
+#         'WIFI_D_mean': df['WIFI_D'].mean(),
+#         'WIFI_A_5G_mean': df['WIFI_A_5G'].mean(),
+#         'WIFI_B_5G_mean': df['WIFI_B_5G'].mean(),
+#         'WIFI_C_5G_mean': df['WIFI_C_5G'].mean(),
+#         'WIFI_D_5G_mean': df['WIFI_D_5G'].mean(),
+#         'WIFI_A_median': df['WIFI_A'].median(),
+#         'WIFI_B_median': df['WIFI_B'].median(),
+#         'WIFI_C_median': df['WIFI_C'].median(),
+#         'WIFI_D_median': df['WIFI_D'].median(),
+#         'WIFI_A_5G_median': df['WIFI_A_5G'].median(),
+#         'WIFI_B_5G_median': df['WIFI_B_5G'].median(),
+#         'WIFI_C_5G_median': df['WIFI_C_5G'].median(),
+#         'WIFI_D_5G_median': df['WIFI_D_5G'].median(),
+#         'WIFI_A_max': df['WIFI_A'].max(),
+#         'WIFI_B_max': df['WIFI_B'].max(),
+#         'WIFI_C_max': df['WIFI_C'].max(),
+#         'WIFI_D_max': df['WIFI_D'].max(),
+#         'WIFI_A_5G_max': df['WIFI_A_5G'].max(),
+#         'WIFI_B_5G_max': df['WIFI_B_5G'].max(),
+#         'WIFI_C_5G_max': df['WIFI_C_5G'].max(),
+#         'WIFI_D_5G_max': df['WIFI_D_5G'].max(),
+#     }
+#     return results
+def calculate_metrics(folder_path):
+    # Mengambil daftar nama file dalam folder
+    file_names = [f for f in os.listdir(folder_path) if f.endswith('.csv')]
+
+    # Inisialisasi list untuk menyimpan hasil dari setiap file
+    mean_list = []
+    median_list = []
+    max_list = []
+
+    # Iterasi melalui setiap file
+    for file_name in file_names:
+        # Membaca file CSV
+        file_path = os.path.join(folder_path, file_name)
+        df = pd.read_csv(file_path)
+
+        # Memilih kolom Wifi_A sampai Wifi_D
+        wifi_columns = df[['Wifi_A', 'Wifi_B', 'Wifi_C', 'Wifi_D']]
+
+        # Menghitung nilai mean, median, dan max untuk setiap kolom
+        mean_values = np.mean(wifi_columns, axis=0)
+        median_values = np.median(wifi_columns, axis=0)
+        max_values = np.max(wifi_columns, axis=0)
+
+        # Menambahkan hasil ke dalam list
+        mean_list.append(mean_values)
+        median_list.append(median_values)
+        max_list.append(max_values)
+
+    # Mengonversi hasil ke dalam ndarray
+    mean_array = np.array(mean_list)
+    median_array = np.array(median_list)
+    max_array = np.array(max_list)
+
+    return mean_array, median_array, max_array
+
+def euclidean_distance(point1, point2):
+    return distance.euclidean(point1, point2)
     # Convert the results dictionary to a DataFrame
     # results_df = pd.DataFrame([results])
 

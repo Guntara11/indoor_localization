@@ -4,7 +4,7 @@ import csv as commaSeparatedValues
 
 # Inisiasi variabel-variabel
 dataSource = "Alba"
-baseDirectory = r'C:\Users\asus\Documents\project_ega\freelance\Indoor Localization\Raw' + '\\'
+baseDirectory = r'C:\Users\User\Documents\Project\indoor_localization\Raw' + '\\'
 trainingRatio = 0.8
 trainingLength = int(trainingRatio*200)
 distanceOrder = 2
@@ -39,17 +39,30 @@ def predict(tx):
                             var += rssi_centering[beacon, tx[beacon], calc_ordinate, calc_axis, 3]
                         var /= 6
                         distance_power[0] = np.sum(abs(rp_data-test_data)**distanceOrder)/6
-                        # Median
+                        # print("distance Mean : ", distance_power[0])
+                          # Median
                         for beacon in range(6):
                             rp_data[beacon] = rssi_centering[beacon, tx[beacon], calc_ordinate, calc_axis, 1]
                             test_data[beacon] = np.median(rssi[beacon, tx[beacon], ordinate, axis, trainingLength+test_number:trainingLength+windowLength+test_number])
                         distance_power[1] = np.sum(abs(rp_data-test_data)**distanceOrder)/6
+                        # print("distance Median : ", distance_power[1])
                         # Mean
                         for beacon in range(6):
                             rp_data[beacon] = rssi_centering[beacon, tx[beacon], calc_ordinate, calc_axis, 2]
                             test_data[beacon] = np.mean(rssi[beacon, tx[beacon], ordinate, axis, trainingLength+test_number:trainingLength+windowLength+test_number])
+                            # if axis == 0 and calc_axis == 0 and calc_ordinate == 0 and test_number == 0 and beacon == 0:
+                                # Print statements
+                                # print(f"Beacon: {beacon}, Calc_Axis: {calc_axis}, Calc_Ordinate: {calc_ordinate}")
+                                # print("RP data MEAN :", rp_data)
+                                # print("test data MEAN : ", test_data)
                         distance_power[2] = np.sum(abs(rp_data-test_data)**distanceOrder)/6
+                        # print("distance Max : ", distance_power[2])
+                        # print('Distance : ', distance_power)
+                        # print("RP DATA Beacon {} : ".format(beacon))
+                        # print('TEST Data : ',test_data)
                         bayesianLikelihood[calc_ordinate, calc_axis, :] = np.exp(-0.5*distance_power**(2/distanceOrder)/var)
+                        print("likelihood : ", bayesianLikelihood)
+                        
                 # Max
                 coordinate = np.unravel_index(np.argmax(bayesianLikelihood[:, :, 0]), (6, 7))
                 prediction[ordinate, axis, test_number, 0, 0] = coordinate[0]
@@ -89,30 +102,34 @@ for axis in range(7):
             rssi_centering[beacon, 1, ordinate, axis, 1] = np.median(rssi[beacon, 1, ordinate, axis, 0:trainingLength])
             rssi_centering[beacon, 1, ordinate, axis, 2] = np.mean(rssi[beacon, 1, ordinate, axis, 0:trainingLength])
             rssi_centering[beacon, 1, ordinate, axis, 3] = np.var(rssi[beacon, 1, ordinate, axis, 0:trainingLength])
+# print("RSSI at point {0},{1}".format(axis, ordinate))
+# print(rssi[beacon, 0, 0, 1, :])
+tx_value = [1, 0, 1, 0, 1, 1, 0, 1]
+predict(tx_value)
 # Perkiraan lokasi dengan Bayesian Estimator sekaligus mengukur galat perkiraan
-for tx1 in range(2):
-    for tx2 in range(2):
-        for tx3 in range(2):
-            for tx4 in range(2):
-                for tx5 in range(2):
-                    for tx6 in range(2):
-                        predict([tx1, tx2, tx3, tx4, tx5, tx6])
-                        for centeringType in range(3):
-                            print(counter)
-                            rows[counter, 0] = tx_to_str(tx1) + ", " + tx_to_str(tx2) + ", " + tx_to_str(tx3) + ", " + tx_to_str(tx4) + ", " + tx_to_str(tx5) + ", " + tx_to_str(tx6)
-                            if(centeringType == 0):
-                                rows[counter, 1] = "Max"
-                            elif(centeringType == 1):
-                                rows[counter, 1] = "Median"
-                            elif(centeringType == 2):
-                                rows[counter, 1] = "Mean"
-                            else:
-                                rows[counter, 1] = "Error"
-                            rows[counter, 2] = np.mean(prediction[:, :, :, centeringType, 2])
-                            rows[counter, 3] = np.std(prediction[:, :, :, centeringType, 2])
-                            rows[counter, 4] = np.percentile(prediction[:, :, :, centeringType, 2], 95)
-                            counter += 1
-with open(r'D:\Universitas_Gadjah_Mada\Akademis--TIF_2018\Capstone\Python\Spreadsheet\Bayesian Estimator Asimetri' + '\\' + dataSource + " 80-20 Power " + str(distanceOrder) + " Window " + str(windowLength) + ".csv", 'w', newline='') as csvFile:
-    csvWriter = commaSeparatedValues.writer(csvFile)
-    csvWriter.writerow(fields)
-    csvWriter.writerows(rows)
+# for tx1 in range(2):
+#     for tx2 in range(2):
+#         for tx3 in range(2):
+#             for tx4 in range(2):
+#                 for tx5 in range(2):
+#                     for tx6 in range(2):
+#                         predict([tx1, tx2, tx3, tx4, tx5, tx6])
+                        # for centeringType in range(3):
+#                             print(counter)
+#                             rows[counter, 0] = tx_to_str(tx1) + ", " + tx_to_str(tx2) + ", " + tx_to_str(tx3) + ", " + tx_to_str(tx4) + ", " + tx_to_str(tx5) + ", " + tx_to_str(tx6)
+#                             if(centeringType == 0):
+#                                 rows[counter, 1] = "Max"
+#                             elif(centeringType == 1):
+#                                 rows[counter, 1] = "Median"
+#                             elif(centeringType == 2):
+#                                 rows[counter, 1] = "Mean"
+#                             else:
+#                                 rows[counter, 1] = "Error"
+#                             rows[counter, 2] = np.mean(prediction[:, :, :, centeringType, 2])
+#                             rows[counter, 3] = np.std(prediction[:, :, :, centeringType, 2])
+#                             rows[counter, 4] = np.percentile(prediction[:, :, :, centeringType, 2], 95)
+#                             counter += 1
+# with open(r'D:\Universitas_Gadjah_Mada\Akademis--TIF_2018\Capstone\Python\Spreadsheet\Bayesian Estimator Asimetri' + '\\' + dataSource + " 80-20 Power " + str(distanceOrder) + " Window " + str(windowLength) + ".csv", 'w', newline='') as csvFile:
+#     csvWriter = commaSeparatedValues.writer(csvFile)
+#     csvWriter.writerow(fields)
+#     csvWriter.writerows(rows)

@@ -18,8 +18,8 @@ def main():
             if file_name.endswith('.csv'):
                 file_path = os.path.join(folder_path, file_name)
                 df = pd.read_csv(file_path, sep=';')
-                output_path_a23 = "modifiedData_42titik/a23/modified {0}".format(file_name)
-                output_path_f3 = "modifiedData_42titik/f3/modified {0}".format(file_name)
+                output_path_a23 = "modified_output/a23/modified_{0}".format(file_name)
+                output_path_f3 = "modified_output/f3/modified_{0}".format(file_name)
                 if ("_f3" in file_path or "_f23" in file_path or "_F3" in file_path):
                     modify_csv(df, separator=';', output_path= output_path_f3)
                 elif("_a23" in file_path):
