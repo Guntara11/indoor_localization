@@ -15,66 +15,78 @@ def extract_axis_ordinate(filename):
     else:
         return None, None
 
-def calculate_euclidean_distance(wifi_data, array_rp_point):
+def calculate_distance_power(mean_array_rp, mean_array_td):
+    return np.sum((abs(mean_array_td - mean_array_rp))**2) / mean_array_td.shape[0]
+
+def calculate_bayesian_likelihood(distance_power):
+    return np.exp(-0.5 * (distance_power**2) / 1)
+
+def calculate_euclidean_distance(wifi_data, mean_array, metric='euclidean'):
     distances = np.zeros(wifi_data.shape[0])
     for i in range(wifi_data.shape[0]):
-        distances[i] = euclidean_distance(wifi_data.iloc[i].values, array_rp_point)
+        for j in range(mean_array.shape[0]):
+            distances[i, j] = distance.pdist([wifi_data.iloc[i].values, mean_array[j]], metric=metric)
     return distances
 
 def main():
-    data_rp = r'C:\Users\User\Documents\Project\indoor_localization\datasetNew\data_test\a23'
-    data_td = r'C:\Users\User\Documents\Project\indoor_localization\datasetNew\data_train\a23'
+    data_rp = "datasetNew/data_test/a23"
+    data_td = "datasetNew/data_train/a23"
 
     # Menghitung metrik untuk data_rp
     mean_array_rp, median_array_rp, max_array_rp = calculate_metrics(data_rp)
+    # print("mean data :",mean_array_rp)
+    # print("median data :",median_array_rp)
+    # print("max data :",max_array_rp)
 
-    # Menghitung metrik untuk data_td
+    # # Menghitung metrik untuk data_td
     mean_array_td, median_array_td, max_array_td = calculate_metrics(data_td)
+    beacon_mapping = {0: "Wifi_A", 1: "Wifi_B", 2: "Wifi_C", 3: "Wifi_D"}
+    for file_path_rp in os.listdir(data_rp):
+        if file_path_rp.startswith("test_modified"):
+            axis_rp, ordinate_rp = extract_axis_ordinate(file_path_rp)
+            print(axis_rp, ordinate_rp)
+            if axis_rp is not None and ordinate_rp is not None:
+                for file_path_td in os.listdir(data_td):
+                    if file_path_td.startswith("train_modified"):
+                        axis_td, ordinate_td = extract_axis_ordinate(file_path_td)
+                        print("axis_td, ordinate_td")
+                        print(axis_td, ordinate_td)
+                        if axis_td is not None and ordinate_td is not None:
+                            for beacon in range(4):
+                                beacon_name = beacon_mapping[beacon]
 
-    folder_path = data_td
+                                # Calculate distance_power for mean, median, and max
+                                distance_power_mean = calculate_distance_power(mean_array_rp[:, beacon],
+                                                                                mean_array_td[:, beacon])
+                                distance_power_median = calculate_distance_power(median_array_rp[:, beacon],
+                                                                                  median_array_td[:, beacon])
+                                distance_power_max = calculate_distance_power(max_array_rp[:, beacon],
+                                                                               max_array_td[:, beacon])
+                                # Calculate Bayesian likelihood
+                                bayesian_likelihood_mean = calculate_bayesian_likelihood(distance_power_mean)
+                                bayesian_likelihood_median = calculate_bayesian_likelihood(distance_power_median)
+                                bayesian_likelihood_max = calculate_bayesian_likelihood(distance_power_max)
 
-    for filename in os.listdir(folder_path):
-        if filename.startswith("train_modified_") and filename.endswith(".csv"):
-            # Extract axis and ordinate from the filename
-            axis, ordinate = extract_axis_ordinate(filename)
-            if axis is not None and ordinate is not None:
-                # Load the CSV file
-                file_path = os.path.join(folder_path, filename)
-                df = pd.read_csv(file_path)
-                wifi_columns = ['Wifi_A', 'Wifi_B', 'Wifi_C', 'Wifi_D']
-                wifi_data = df[wifi_columns]
-                print("Extracted WiFi Data:")
-                print(wifi_data)
+                                print("axis_rp: {0}, ordinate_rp: {1}, axis_td: {2}, ordinate_td: {3}, beacon: {4}".format(
+                                    axis_rp, ordinate_rp, axis_td, ordinate_td, beacon_name))
+                                print("Bayesian Likelihood (Mean):", bayesian_likelihood_mean)
+                                print("Bayesian Likelihood (Median):", bayesian_likelihood_median)
+                                print("Bayesian Likelihood (Max):", bayesian_likelihood_max)
+    # # Coordinates for rows
+    # coordinates = [(i, j) for i in range(7) for j in range(6)]
 
-                mean_array_rp_point = mean_array_rp[ordinate, axis*4:(axis+1)*4]
-                median_array_rp_point = median_array_rp[ordinate, axis*4:(axis+1)*4]
-                max_array_rp_point = max_array_rp[ordinate, axis*4:(axis+1)*4]
+    # # Beacon names for columns
+    # beacon_names = ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]
 
-                # Debugging print statements
-                print(f"Coordinate: ({axis}, {ordinate})")
-                print("Wifi Data:")
-                print(wifi_data)
-                print("Mean Array RP Point:")
-                print(mean_array_rp_point)
-                print("Median Array RP Point:")
-                print(median_array_rp_point)
-                print("Max Array RP Point:")
-                print(max_array_rp_point)
-                
-                distances_mean = calculate_euclidean_distance(wifi_data, mean_array_rp_point)
-                distances_median = calculate_euclidean_distance(wifi_data, median_array_rp_point)
-                distances_max = calculate_euclidean_distance(wifi_data, max_array_rp_point)
-                # Display or store the results
-                print(f"Coordinate: ({axis}, {ordinate})")
-                print("Euclidean Distances (Mean):")
-                print(distances_mean)
+    # # Create a DataFrame
+    # data_dict = {"Coordinates": coordinates}
+    # for i, beacon_name in enumerate(beacon_names):
+    #     data_dict[beacon_name] = mean_array_rp[:, i]
 
-                print("\nEuclidean Distances (Median):")
-                print(distances_median)
+    # df = pd.DataFrame(data_dict)
 
-                print("\nEuclidean Distances (Max):")
-                print(distances_max)
-
+# Display the DataFrame
+    # print(df)
 
 if __name__ == "__main__":
     main()
