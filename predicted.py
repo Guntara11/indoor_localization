@@ -37,6 +37,8 @@ def main():
     # print("mean data :",mean_array_rp)
     # print("median data :",median_array_rp)
     # print("max data :",max_array_rp)
+    # Inisialisasi list untuk menyimpan Bayesian likelihood
+    all_bayesian_likelihood = []
 
     # # Menghitung metrik untuk data_td
     mean_array_td, median_array_td, max_array_td = calculate_metrics(data_td)
@@ -52,26 +54,81 @@ def main():
                         print("axis_td, ordinate_td")
                         print(axis_td, ordinate_td)
                         if axis_td is not None and ordinate_td is not None:
-                            for beacon in range(4):
-                                beacon_name = beacon_mapping[beacon]
+                            true_location = [axis_rp, ordinate_rp]
+                            predictions = []
+                            # Inisialisasi DataFrame untuk menyimpan Bayesian likelihood
+                            bayesian_likelihood_df = pd.DataFrame(columns=['mean', 'median', 'max'])
+                            for axis_rp in range(7):
+                                for ordinate_rp in range(6):
+                                    
+                                    for beacon in range(4):
+                                        beacon_name = beacon_mapping[beacon]
 
-                                # Calculate distance_power for mean, median, and max
-                                distance_power_mean = calculate_distance_power(mean_array_rp[:, beacon],
-                                                                                mean_array_td[:, beacon])
-                                distance_power_median = calculate_distance_power(median_array_rp[:, beacon],
-                                                                                  median_array_td[:, beacon])
-                                distance_power_max = calculate_distance_power(max_array_rp[:, beacon],
-                                                                               max_array_td[:, beacon])
-                                # Calculate Bayesian likelihood
-                                bayesian_likelihood_mean = calculate_bayesian_likelihood(distance_power_mean)
-                                bayesian_likelihood_median = calculate_bayesian_likelihood(distance_power_median)
-                                bayesian_likelihood_max = calculate_bayesian_likelihood(distance_power_max)
+                                        # Calculate distance_power for mean, median, and max
+                                        distance_power_mean = calculate_distance_power(mean_array_rp[:, beacon],
+                                                                                        mean_array_td[:, beacon])
+                                        distance_power_median = calculate_distance_power(median_array_rp[:, beacon],
+                                                                                        median_array_td[:, beacon])
+                                        distance_power_max = calculate_distance_power(max_array_rp[:, beacon],
+                                                                                    max_array_td[:, beacon])
+                                        # Calculate Bayesian likelihood
+                                        bayesian_likelihood_mean = calculate_bayesian_likelihood(distance_power_mean)
+                                        bayesian_likelihood_median = calculate_bayesian_likelihood(distance_power_median)
+                                        bayesian_likelihood_max = calculate_bayesian_likelihood(distance_power_max)
+                                        
+                                        # Menambahkan ke DataFrame menggunakan loc
+                                        bayesian_likelihood_df.loc[len(bayesian_likelihood_df)] = [bayesian_likelihood_mean, bayesian_likelihood_median, bayesian_likelihood_max]
 
-                                print("axis_rp: {0}, ordinate_rp: {1}, axis_td: {2}, ordinate_td: {3}, beacon: {4}".format(
-                                    axis_rp, ordinate_rp, axis_td, ordinate_td, beacon_name))
-                                print("Bayesian Likelihood (Mean):", bayesian_likelihood_mean)
-                                print("Bayesian Likelihood (Median):", bayesian_likelihood_median)
-                                print("Bayesian Likelihood (Max):", bayesian_likelihood_max)
+                                        # Menambahkan ke list
+                                        all_bayesian_likelihood.append([bayesian_likelihood_mean, bayesian_likelihood_median, bayesian_likelihood_max])
+
+                                        # Mengonversi list menjadi ndarray
+                                        combined_likelihood = np.array(all_bayesian_likelihood)[:, np.newaxis, :]
+
+                                        # Menampilkan hasil array tiga dimensi
+                                        print("Combined Bayesian Likelihood:")
+                                        print(combined_likelihood)
+                                    
+                                        # # print("axis_rp: {0}, ordinate_rp: {1}, axis_td: {2}, ordinate_td: {3}, beacon: {4}".format(
+                                        #     axis_rp, ordinate_rp, axis_td, ordinate_td, beacon_name))
+                                        # print("Bayesian Likelihood (Mean):", bayesian_likelihood_mean)
+                                        # print("Bayesian Likelihood (Median):", bayesian_likelihood_median)
+                                        # print("Bayesian Likelihood (Max):", bayesian_likelihood_max)
+                                    
+                                # Mean
+                                coordinate_mean = np.unravel_index(np.argmax(combined_likelihood[:, :, 0]),(6, 7))
+                                prediction_mean = [coordinate_mean[1], coordinate_mean[0], math.sqrt((coordinate_mean[1] - ordinate_rp)**2 + (coordinate_mean[0] - axis_rp)**2)]
+                                predictions.append(prediction_mean)
+
+                                # Median
+                                coordinate_median = np.unravel_index(np.argmax(combined_likelihood[:, :, 0]),(6, 7))
+                                prediction_median = [coordinate_median[1], coordinate_median[0], math.sqrt((coordinate_median[1] - ordinate_rp)**2 + (coordinate_median[0] - axis_rp)**2)]
+                                predictions.append(prediction_median)
+
+                                # Max
+                                coordinate_max = np.unravel_index(np.argmax(combined_likelihood[:, :, 0]),(6, 7))
+                                prediction_max = [coordinate_max[1], coordinate_max[0], math.sqrt((coordinate_max[1] - ordinate_rp)**2 + (coordinate_max[0] - axis_rp)**2)]
+                                predictions.append(prediction_max)
+
+                                    # # Mean
+                                    # coordinate_mean = np.unravel_index(np.argmax(combined_likelihood[:, :, 0]), (6, 7))
+                                    # prediction_mean = [coordinate_mean[1], coordinate_mean[0], math.sqrt((coordinate_mean[1] - ordinate_rp)**2 + (coordinate_mean[0] - axis_rp)**2)]
+                                    # predictions.append(prediction_mean)
+
+                                    # # Median
+                                    # coordinate_median = np.unravel_index(np.argmax(combined_likelihood[:, :, 1]), (6, 7))
+                                    # prediction_median = [coordinate_median[1], coordinate_median[0], math.sqrt((coordinate_median[1] - ordinate_rp)**2 + (coordinate_median[0] - axis_rp)**2)]
+                                    # predictions.append(prediction_median)
+
+                                    # # Max
+                                    # coordinate_max = np.unravel_index(np.argmax(combined_likelihood[:, :, 2]), (6, 7))
+                                    # prediction_max = [coordinate_max[1], coordinate_max[0], math.sqrt((coordinate_max[1] - ordinate_rp)**2 + (coordinate_max[0] - axis_rp)**2)]
+                                    # predictions.append(prediction_max)
+
+                                print(coordinate_mean)
+                                print(coordinate_median)
+                                print(coordinate_max)
+                                        
     # # Coordinates for rows
     # coordinates = [(i, j) for i in range(7) for j in range(6)]
 
