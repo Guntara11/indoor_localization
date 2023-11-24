@@ -6,9 +6,6 @@ from scipy import stats
 from scipy.optimize import minimize
 from utils import *
 from sklearn.model_selection import train_test_split
-from sklearn.linear_model import BayesianRidge
-from sklearn.metrics import mean_squared_error
-from sklearn.preprocessing import MinMaxScaler
 
 def partition_data(df, num_partitions=5):
     partioned_data = []
@@ -22,25 +19,13 @@ def plot_histogram(gaussian_histogram, title):
     plt.title(title)
     plt.show()
 
-def euclidean_distance(point1, point2):
-    return distance.euclidean(point1, point2)
-
-def rmse(predictions, targets):
-    return np.sqrt(np.mean((predictions - targets) ** 2))
 
 #memindahkan ke folder partition
 def split_data (dataset_split_path, dataset_file, dataset_file_origin):
     if "partition_1" in dataset_file:
-        dataset_folder_destination_satu = os.path.join(dataset_split_path, "partition_1")
-        dataset_file_destination_satu = os.path.join(dataset_folder_destination_satu, dataset_file)
-
-        if "partition_10" in dataset_file:
-            dataset_folder_destination = os.path.join(dataset_split_path, "partition_10")
-            dataset_file_destination = os.path.join(dataset_folder_destination, dataset_file)
-
-            shutil.move(dataset_file_origin, dataset_file_destination)
-        else:
-            shutil.move(dataset_file_origin, dataset_file_destination_satu)
+        dataset_folder_destination = os.path.join(dataset_split_path, "partition_1")
+        dataset_file_destination= os.path.join(dataset_folder_destination, dataset_file)
+        shutil.move(dataset_file_origin, dataset_file_destination)
 
     elif "partition_2" in dataset_file:
         dataset_folder_destination = os.path.join(dataset_split_path, "partition_2")
@@ -75,6 +60,7 @@ if __name__ == "__main__":
     if os.path.exists(folder_path):
         # List all files in the folder
         file_list = os.listdir(folder_path)
+        print(file_list)
         for file_name in file_list:
             if file_name.endswith('.csv'):
                 file_path = os.path.join(folder_path, file_name)
@@ -149,41 +135,41 @@ if __name__ == "__main__":
 # Pindahkan code di bawah blok komen ke main py , dan juga buat proses di bawah untuk memproses semua data 
 # yang ada di folder train dan test, 
 # ##################################################################################################################
-        # Load the train and test CSV files
-    train_data = pd.read_csv("train_modified (0,1)_a23 - 08-08-2023 14-10-13.csv_partition_1.csv")
-    test_dataset = pd.read_csv("test_modified (0,1)_a23 - 08-08-2023 14-10-13.csv_partition_1.csv")
+    #     # Load the train and test CSV files
+    # train_data = pd.read_csv("train_modified (0,1)_a23 - 08-08-2023 14-10-13.csv_partition_1.csv")
+    # test_dataset = pd.read_csv("test_modified (0,1)_a23 - 08-08-2023 14-10-13.csv_partition_1.csv")
 
-    scaler = MinMaxScaler()
-    test_dataset[["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]] = scaler.fit_transform(test_dataset[["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]])
-    print("Specific Test Data (After Scaling):")
-    print(test_dataset)
+    # scaler = MinMaxScaler()
+    # test_dataset[["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]] = scaler.fit_transform(test_dataset[["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]])
+    # print("Specific Test Data (After Scaling):")
+    # print(test_dataset)
 
-    # Specify the columns for Bayesian estimation
-    stat_data = pd.read_csv("Raw_statData_Wifi_A.csv")
-    centers = stat_data[["Mean", "Median", "Maximum"]].values
-    # for i, (train_data, test_data) in enumerate(partitioned_data, 1):
-    distances_mean = []
-    distances_median = []
-    distances_maximum = []
+    # # Specify the columns for Bayesian estimation
+    # stat_data = pd.read_csv("Raw_statData_Wifi_A.csv")
+    # centers = stat_data[["Mean", "Median", "Maximum"]].values
+    # # for i, (train_data, test_data) in enumerate(partitioned_data, 1):
+    # distances_mean = []
+    # distances_median = []
+    # distances_maximum = []
 
-    for column in ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]:
-        test_column = test_dataset[column]
-        mean = stat_data.at[0, "Mean"]
-        median = stat_data.at[0, "Median"]
-        maximum = stat_data.at[0, "Maximum"]
-        distances_mean.append(euclidean_distance(test_column, mean))
-        distances_median.append(euclidean_distance(test_column, median))
-        distances_maximum.append(euclidean_distance(test_column, maximum))
+    # for column in ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]:
+    #     test_column = test_dataset[column]
+    #     mean = stat_data.at[0, "Mean"]
+    #     median = stat_data.at[0, "Median"]
+    #     maximum = stat_data.at[0, "Maximum"]
+    #     distances_mean.append(euclidean_distance(test_column, mean))
+    #     distances_median.append(euclidean_distance(test_column, median))
+    #     distances_maximum.append(euclidean_distance(test_column, maximum))
 
 
     # print(mean)
     # print(median)
     # print(maximum)
     # print(test_dataset)
-    print(f"Euclidean Distances for Partition {i} (WiFi_A, WiFi_B, WiFi_C, WiFi_D):")
-    print("Mean Distance:", distances_mean)
-    print("Median Distance:", distances_median)
-    print("Maximum Distance:", distances_maximum)
+    # print(f"Euclidean Distances for Partition {i} (WiFi_A, WiFi_B, WiFi_C, WiFi_D):")
+    # print("Mean Distance:", distances_mean)
+    # print("Median Distance:", distances_median)
+    # print("Maximum Distance:", distances_maximum)
 
     
 #   # Calculate RMSE between test_data and first Mean, Median, and Maximum for each column

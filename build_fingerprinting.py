@@ -17,7 +17,7 @@ max_values = []
 
 # Define a regex pattern to extract x and y from the file name
 # pattern = re.compile(r"modified \((\d+),(\d+)\)_a23 - \d{2}-\d{2}-\d{4} \d{2}-\d{2}-\d{2}")
-pattern = re.compile(r"test_modified \((\d+),(\d+)\)_a23 - \d{2}-\d{2}-\d{4} \d{2}-\d{2}-\d{2}")
+pattern = re.compile(r"test_modified_\((\d+),(\d+)\)_a23 - \d{2}-\d{2}-\d{4} \d{2}-\d{2}-\d{2}")
 
 
 for file_name in os.listdir(folder_path):
