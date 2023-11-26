@@ -32,6 +32,7 @@ def main():
     beacons = ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]
     frequencies = ["2.4GHz", "5GHz"]
     distanceOrder = 2
+    var = 0
 
     statistics_td = {
         device: {
@@ -163,20 +164,21 @@ def main():
                             # Calculate distance for each point
                             distances = []
                             # Initialize the array for Bayesian likelihood
-                            bayesian_likelihood_function = np.zeros((7, 6))
+                            bayesian_likelihood_function = np.zeros([7, 6, 3], dtype=float)
                             for axis_rp in range(7):
                                 for ordinate_rp in range(6):
-                                    var = 4
                                     mean_rp = mean_values_rp[device][beacon][frequency]["mean"][axis][ordinate]
                                     mean_td = statistics_td[device][beacon][frequency]["mean"][axis_rp][ordinate_rp]
                                     distance = np.sum(np.abs(mean_rp - mean_td) ** 2) / len(beacons)
                                     distances.append(distance)
-
+                                    var += rssi_values_rp[ordinate_rp]
+                                    var /= 4
                                     # Store or print the calculated distance
                                     distance_values[device][frequency][axis_rp][ordinate_rp] = np.sqrt(np.mean(distances))
                                     # Calculate Bayesian likelihood using the formula you provided
-                                    bayesian_likelihood_function[axis_rp][ordinate_rp] = np.exp(-0.5 * (distance_values[device][frequency][axis_rp][ordinate_rp] ** (2 / distanceOrder)) / var)
-                            print(bayesian_likelihood_function)
+                                    bayesian_likelihood_function[axis_rp][ordinate_rp] = np.exp(-0.5 * (distance_values[device][frequency][axis_rp][ordinate_rp]) ** (1 / var))
+                                print([beacon, device, frequency, bayesian_likelihood_function])
+                            # print(rssi_values_rp)
                             # ic("RP data : ")
                             # ic(f"Data for {device_info}, {beacon}, {frequency}, ({axis}, {ordinate}):")
                             # ic(f"Mean : {mean_value_rp}, Median: {median_value_rp}, Max: {max_value_rp}")
