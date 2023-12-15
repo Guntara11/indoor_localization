@@ -6,6 +6,19 @@ import utils
 from icecream import ic
 from utils import *
 from scipy.spatial import distance
+from sklearn.preprocessing import MinMaxScaler
+
+
+trainingRatio = 0.8
+trainingLength = int(trainingRatio*200)
+windowLength = 8
+
+dataset = ["train", "test"]
+devices = ["a23", "f3"]
+beacons = ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]
+frequencies = ["2.4GHz", "5GHz"]
+
+rssi_centering = []
 
 def extract_file_info(filename):
     # Extract axis and ordinate from the filename
@@ -18,79 +31,87 @@ def extract_file_info(filename):
 
     return device_info, axis, ordinate
 
+
+def calculate_metrics(rssi_values):
+    mean_value = np.mean(rssi_values)
+    median_value = np.median(rssi_values)
+    max_value = np.max(rssi_values)
+    variance_value = np.var(rssi_values)
+    return mean_value, median_value, max_value, variance_value
+
+def predict(train_data, test_data):
+    # Iterate over devices
+    for device in devices:
+        print(f"Device: {device}")
+        # Iterate over beacons
+        for beacon in beacons:
+            # Iterate over frequencies
+            for frequency in frequencies:
+                # Filter entries based on device, beacon, and frequency for both train and test data
+                filtered_train_entries = [entry for entry in train_data if entry[0] == device and entry[3] == beacon and entry[4] == frequency]
+                filtered_test_entries = [entry for entry in test_data if entry[0] == device and entry[3] == beacon and entry[4] == frequency]
+
+                # Iterate over actual points
+                for train_entry in filtered_train_entries:
+                    axis, ordinate, rssi_values_td = train_entry[1], train_entry[2], train_entry[9]
+
+                    # Access rssi_values_rp for each predicted point
+                    for test_entry in filtered_test_entries:
+                        calc_axis, calc_ordinate, rssi_values_rp = test_entry[1], test_entry[2], test_entry[9]
+
+                        # Calculate mean, median, max, and variance for rssi_values_td and rssi_values_rp
+                        mean_value_td, median_value_td, max_value_td, variance_value_td = calculate_metrics(rssi_values_td)
+                        mean_value_rp, median_value_rp, max_value_rp, variance_value_rp = calculate_metrics(rssi_values_rp)
+
+                        # Process or print the data as needed
+                        print(f"Actual Point ({axis}, {ordinate}) - Predicted Point ({calc_axis}, {calc_ordinate}) - {beacon} ({frequency}):")
+                        print(f"Train Data - Mean: {mean_value_td}, Median: {median_value_td}, Max: {max_value_td}, Variance: {variance_value_td}")
+                        print(f"Test Data - Mean: {mean_value_rp}, Median: {median_value_rp}, Max: {max_value_rp}, Variance: {variance_value_rp}")
 def main():
     # Define the folder paths
     data_root = ""
     data_folder = os.path.join(data_root, "dataset")
 
-    # Define the devices, beacons, and frequencies
-    dataset = ["train", "test"]
-    devices = ["a23", "f3"]
-    beacons = ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]
-    frequencies = ["2.4GHz", "5GHz"]
-
-    # rssi_centering_list = []
-
+    train_data = []
+    test_data = []
     for data in dataset:
         if data == "train":
             dataset_folder = os.path.join(data_folder, "train")
-            dataset_train_folder = dataset_folder
-
-            for device in devices:
-                device_folder = os.path.join(dataset_folder, device)
-                partition_1_path = os.path.join(device_folder, "partition_1")
-                rssi_centering_list = {beacon: {frequency: [] for frequency in frequencies} for beacon in beacons}
-                for file_name in os.listdir(partition_1_path):
-                    file_path = os.path.join(partition_1_path, file_name)
-                    device_info, axis, ordinate = extract_file_info(file_name)
-                    df_td = pd.read_csv(file_path)
-
-                    for beacon in beacons:
-                        for frequency in frequencies:
-                            column_name = f"{beacon}"
-                            if frequency == "5GHz":
-                                column_name += "_5G"
-
-                            rssi_values_td = df_td[column_name].tolist()
-                            mean_value = np.mean(rssi_values_td)
-                            median_value = np.median(rssi_values_td)
-                            max_value = np.max(rssi_values_td)
-                            variance_value = np.var(rssi_values_td)
-                            # Append the results to the list
-                            rssi_centering_list[beacon][frequency].append([mean_value, median_value, max_value, variance_value])
-                            # print(f"Results for {beacon} - {frequency}:")
-            for entry in rssi_centering_list[beacon][frequency]:
-                print(entry)
-
-                        # print(rssi_centering_point)
-                            # print(mean_value)
-                            # print(median_value)
-                            # print(max_value)
-                            # ic(device_info, axis, ordinate, beacon, frequency, mean_value, median_value, max_value)
-
         elif data == "test":
             dataset_folder = os.path.join(data_folder, "test")
-            dataset_test_folder = dataset_folder
 
-            for device in devices:
-                device_folder = os.path.join(dataset_folder, device)
-                partition_1_path = os.path.join(device_folder, "partition_1")
+        for device in devices:
+            device_folder = os.path.join(dataset_folder, device)
+            partition_1_path = os.path.join(device_folder, "partition_1")
 
-                for file_name in os.listdir(partition_1_path):
-                    file_path = os.path.join(partition_1_path, file_name)
-                    device_info, axis, ordinate = extract_file_info(file_name)
-                    df_rp = pd.read_csv(file_path)
+            for file_name in os.listdir(partition_1_path):
+                file_path = os.path.join(partition_1_path, file_name)
+                device_info, axis, ordinate = extract_file_info(file_name)
+                df = pd.read_csv(file_path)
 
-                    for beacon in beacons:
-                        for frequency in frequencies:
-                            column_name = f"{beacon}"
-                            if frequency == "5GHz":
-                                column_name += "_5G"
+                for beacon in beacons:
+                    for frequency in frequencies:
+                        column_name = f"{beacon}"
+                        if frequency == "5GHz":
+                            column_name += "_5G"
 
-                            rssi_values_rp = df_rp[column_name].tolist()
-                            # print(rssi_values_rp)
+                        # Use separate variables for train and test data
+                        if data == "train":
+                            rssi_values = df[column_name].tolist()
+                            rssi_values_td = rssi_values
+                            mean_value, median_value, max_value, variance_value = calculate_metrics(rssi_values_td)
+                            train_data.append([device_info, axis, ordinate, beacon, frequency, mean_value, median_value, max_value, variance_value, rssi_values_td])
                             
-
+                        elif data == "test":
+                            rssi_values = df[column_name].tolist()
+                            rssi_values_rp = rssi_values
+                            mean_value, median_value, max_value, variance_value = calculate_metrics(rssi_values_rp)
+                            test_data.append([device_info, axis, ordinate, beacon, frequency, mean_value, median_value, max_value, variance_value, rssi_values_rp])
+                            # rssi_centering.append([mean_value, median_value, max_value, variance_value])
+                            # print(rssi_centering)
+                        # print(rssi_values_td)
+                        # print(rssi_centering)
+    predict(train_data, test_data)
 if __name__ == "__main__":
     main()
 
