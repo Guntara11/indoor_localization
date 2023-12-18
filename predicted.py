@@ -13,6 +13,8 @@ trainingRatio = 0.8
 trainingLength = int(trainingRatio*200)
 windowLength = 8
 
+distance_order = 2
+
 dataset = ["train", "test"]
 devices = ["a23", "f3"]
 beacons = ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]
@@ -39,6 +41,9 @@ def calculate_metrics(rssi_values):
     variance_value = np.var(rssi_values)
     return mean_value, median_value, max_value, variance_value
 
+def calculate_bayesian_likelihood(distance_power, variance, distance_order):
+    return np.exp(-0.5 * (distance_power ** (2 / distance_order)) / variance)
+
 def predict(train_data, test_data):
     # Iterate over devices
     for device in devices:
@@ -63,10 +68,25 @@ def predict(train_data, test_data):
                         mean_value_td, median_value_td, max_value_td, variance_value_td = calculate_metrics(rssi_values_td)
                         mean_value_rp, median_value_rp, max_value_rp, variance_value_rp = calculate_metrics(rssi_values_rp)
 
+                        mean_distance_power = np.sum(np.abs(mean_value_rp - mean_value_td) ** 2) / 4
+                        median_distance_power = np.sum(np.abs(median_value_rp - median_value_td) ** 2) / 4
+                        max_distance_power = np.sum(np.abs(max_value_rp - max_value_td) ** 2) / 4
+
+                        # Calculate Bayesian likelihood values
+                        likelihood_mean = calculate_bayesian_likelihood(mean_distance_power, variance_value_rp, distance_order)
+                        likelihood_median = calculate_bayesian_likelihood(median_distance_power, variance_value_rp, distance_order)
+                        likelihood_max = calculate_bayesian_likelihood(max_distance_power, variance_value_rp, distance_order)
+
                         # Process or print the data as needed
                         print(f"Actual Point ({axis}, {ordinate}) - Predicted Point ({calc_axis}, {calc_ordinate}) - {beacon} ({frequency}):")
-                        print(f"Train Data - Mean: {mean_value_td}, Median: {median_value_td}, Max: {max_value_td}, Variance: {variance_value_td}")
-                        print(f"Test Data - Mean: {mean_value_rp}, Median: {median_value_rp}, Max: {max_value_rp}, Variance: {variance_value_rp}")
+                        print(f"Train Data - Mean: {mean_value_td}")
+                        print(f"Test Data - Mean: {mean_value_rp}")
+                        print(f"Distance Power (mean): {mean_distance_power}")
+                        print(f"Distance Power (median): {median_distance_power}")
+                        print(f"Distance Power (max): {max_distance_power}")
+                        print(f"Bayesian Likelihood (Mean): {likelihood_mean}")
+                        print(f"Bayesian Likelihood (Median): {likelihood_median}")
+                        print(f"Bayesian Likelihood (Max): {likelihood_max}")
 def main():
     # Define the folder paths
     data_root = ""
