@@ -45,6 +45,9 @@ def calculate_bayesian_likelihood(distance_power, variance, distance_order):
     return np.exp(-0.5 * (distance_power ** (2 / distance_order)) / variance)
 
 def predict(train_data, test_data):
+    predicted_points_mean = []   # List to store predicted points for mean
+    predicted_points_median = [] # List to store predicted points for median
+    predicted_points_max = []  
     # Iterate over devices
     for device in devices:
         print(f"Device: {device}")
@@ -59,7 +62,10 @@ def predict(train_data, test_data):
                 # Iterate over actual points
                 for train_entry in filtered_train_entries:
                     axis, ordinate, rssi_values_td = train_entry[1], train_entry[2], train_entry[9]
-
+                    # Access rssi_values_rp for each predicted point
+                    predicted_points_mean = []
+                    predicted_points_median = []  
+                    predicted_points_max = []  
                     # Access rssi_values_rp for each predicted point
                     for test_entry in filtered_test_entries:
                         calc_axis, calc_ordinate, rssi_values_rp = test_entry[1], test_entry[2], test_entry[9]
@@ -77,16 +83,24 @@ def predict(train_data, test_data):
                         likelihood_median = calculate_bayesian_likelihood(median_distance_power, variance_value_rp, distance_order)
                         likelihood_max = calculate_bayesian_likelihood(max_distance_power, variance_value_rp, distance_order)
 
-                        # Process or print the data as needed
-                        print(f"Actual Point ({axis}, {ordinate}) - Predicted Point ({calc_axis}, {calc_ordinate}) - {beacon} ({frequency}):")
-                        print(f"Train Data - Mean: {mean_value_td}")
-                        print(f"Test Data - Mean: {mean_value_rp}")
-                        print(f"Distance Power (mean): {mean_distance_power}")
-                        print(f"Distance Power (median): {median_distance_power}")
-                        print(f"Distance Power (max): {max_distance_power}")
-                        print(f"Bayesian Likelihood (Mean): {likelihood_mean}")
-                        print(f"Bayesian Likelihood (Median): {likelihood_median}")
-                        print(f"Bayesian Likelihood (Max): {likelihood_max}")
+                        predicted_points_mean.append((calc_axis, calc_ordinate, likelihood_mean))
+                        predicted_points_median.append((calc_axis, calc_ordinate, likelihood_median))
+                        predicted_points_max.append((calc_axis, calc_ordinate, likelihood_max))
+
+                    best_predicted_point_mean = max(predicted_points_mean, key=lambda x: x[2])
+                    best_predicted_point_median = max(predicted_points_median, key=lambda x: x[2])
+                    best_predicted_point_max = max(predicted_points_max, key=lambda x: x[2])
+                    
+                    # Calculate errors
+                    error_mean = math.sqrt((best_predicted_point_mean[0] - axis) ** 2 + (best_predicted_point_mean[1] - ordinate) ** 2)
+                    error_median = math.sqrt((best_predicted_point_median[0] - axis) ** 2 + (best_predicted_point_median[1] - ordinate) ** 2)
+                    error_max = math.sqrt((best_predicted_point_max[0] - axis) ** 2 + (best_predicted_point_max[1] - ordinate) ** 2)
+
+                    print(f"Actual Point ({axis}, {ordinate}) - {beacon} ({frequency}):")
+                    print(f"Predicted Point (Based on Mean Likelihood): {best_predicted_point_mean[0]}, {best_predicted_point_mean[1]} - Error: {error_mean}")
+                    print(f"Predicted Point (Based on Median Likelihood): {best_predicted_point_median[0]}, {best_predicted_point_median[1]} - Error: {error_median}")
+                    print(f"Predicted Point (Based on Max Likelihood): {best_predicted_point_max[0]}, {best_predicted_point_max[1]} - Error: {error_max}")
+
 def main():
     # Define the folder paths
     data_root = ""
