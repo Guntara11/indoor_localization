@@ -107,28 +107,28 @@ for axis in range(7):
 tx_value = [1, 0, 1, 0, 1, 1, 0, 1]
 predict(tx_value)
 # Perkiraan lokasi dengan Bayesian Estimator sekaligus mengukur galat perkiraan
-# for tx1 in range(2):
-#     for tx2 in range(2):
-#         for tx3 in range(2):
-#             for tx4 in range(2):
-#                 for tx5 in range(2):
-#                     for tx6 in range(2):
-#                         predict([tx1, tx2, tx3, tx4, tx5, tx6])
-                        # for centeringType in range(3):
-#                             print(counter)
-#                             rows[counter, 0] = tx_to_str(tx1) + ", " + tx_to_str(tx2) + ", " + tx_to_str(tx3) + ", " + tx_to_str(tx4) + ", " + tx_to_str(tx5) + ", " + tx_to_str(tx6)
-#                             if(centeringType == 0):
-#                                 rows[counter, 1] = "Max"
-#                             elif(centeringType == 1):
-#                                 rows[counter, 1] = "Median"
-#                             elif(centeringType == 2):
-#                                 rows[counter, 1] = "Mean"
-#                             else:
-#                                 rows[counter, 1] = "Error"
-#                             rows[counter, 2] = np.mean(prediction[:, :, :, centeringType, 2])
-#                             rows[counter, 3] = np.std(prediction[:, :, :, centeringType, 2])
-#                             rows[counter, 4] = np.percentile(prediction[:, :, :, centeringType, 2], 95)
-#                             counter += 1
+for tx1 in range(2):
+    for tx2 in range(2):
+        for tx3 in range(2):
+            for tx4 in range(2):
+                for tx5 in range(2):
+                    for tx6 in range(2):
+                        predict([tx1, tx2, tx3, tx4, tx5, tx6])
+                        for centeringType in range(3):
+                            print(counter)
+                            rows[counter, 0] = tx_to_str(tx1) + ", " + tx_to_str(tx2) + ", " + tx_to_str(tx3) + ", " + tx_to_str(tx4) + ", " + tx_to_str(tx5) + ", " + tx_to_str(tx6)
+                            if(centeringType == 0):
+                                rows[counter, 1] = "Max"
+                            elif(centeringType == 1):
+                                rows[counter, 1] = "Median"
+                            elif(centeringType == 2):
+                                rows[counter, 1] = "Mean"
+                            else:
+                                rows[counter, 1] = "Error"
+                            rows[counter, 2] = np.mean(prediction[:, :, :, centeringType, 2])
+                            rows[counter, 3] = np.std(prediction[:, :, :, centeringType, 2])
+                            rows[counter, 4] = np.percentile(prediction[:, :, :, centeringType, 2], 95)
+                            counter += 1
 # with open(r'D:\Universitas_Gadjah_Mada\Akademis--TIF_2018\Capstone\Python\Spreadsheet\Bayesian Estimator Asimetri' + '\\' + dataSource + " 80-20 Power " + str(distanceOrder) + " Window " + str(windowLength) + ".csv", 'w', newline='') as csvFile:
 #     csvWriter = commaSeparatedValues.writer(csvFile)
 #     csvWriter.writerow(fields)
