@@ -8,7 +8,7 @@ from utils import *
 from scipy.spatial import distance
 from sklearn.preprocessing import MinMaxScaler
 import csv
-
+import itertools
 
 trainingRatio = 0.8
 trainingLength = int(trainingRatio*200)
@@ -46,22 +46,29 @@ def calculate_metrics(rssi_values):
 def calculate_bayesian_likelihood(distance_power, variance, distance_order):
     return np.exp(-0.5 * (distance_power ** (2 / distance_order)) / variance)
 
-def predict(train_data, test_data):
-    predicted_points_mean = []   # List to store predicted points for mean
-    predicted_points_median = [] # List to store predicted points for median
-    predicted_points_max = []
-    error_mean_combine = {beacon: {freq: [] for freq in frequencies} for beacon in beacons}
-    error_median_combine = {beacon: {freq: [] for freq in frequencies} for beacon in beacons}
-    error_max_combine = {beacon: {freq: [] for freq in frequencies} for beacon in beacons}
+def generate_combinations(beacons, frequencies):
+    # Generate all possible combinations of beacons and frequencies
+    combinations = list(itertools.product(beacons, frequencies))
+    return combinations
 
-    # Iterate over devices
+
+def predict(train_data, test_data):
+    errors_mean = {}
+    errors_median = {}
+    errors_max = {}
     for device in devices:
         # print(f"Device: {device}")
-        # Iterate over beacons
+        errors_mean[device] = {}
+        errors_median[device] = {}
+        errors_max[device] = {}
         for beacon in beacons:
-            # Iterate over frequencies
+            errors_mean[device][beacon] = {}
+            errors_median[device][beacon] = {}
+            errors_max[device][beacon] = {}
             for frequency in frequencies:
-                # Filter entries based on device, beacon, and frequency for both train and test data
+                errors_mean[device][beacon][frequency] = []
+                errors_median[device][beacon][frequency] = []
+                errors_max[device][beacon][frequency] = []
                 filtered_train_entries = [entry for entry in train_data if entry[0] == device and entry[3] == beacon and entry[4] == frequency]
                 filtered_test_entries = [entry for entry in test_data if entry[0] == device and entry[3] == beacon and entry[4] == frequency]
 
@@ -101,109 +108,20 @@ def predict(train_data, test_data):
                     error_mean = math.sqrt((best_predicted_point_mean[0] - axis) ** 2 + (best_predicted_point_mean[1] - ordinate) ** 2)
                     error_median = math.sqrt((best_predicted_point_median[0] - axis) ** 2 + (best_predicted_point_median[1] - ordinate) ** 2)
                     error_max = math.sqrt((best_predicted_point_max[0] - axis) ** 2 + (best_predicted_point_max[1] - ordinate) ** 2)
-
+                    # Store errors separately for devices
+                    # Store errors in the dictionaries
+                    errors_mean[device][beacon][frequency].append(error_mean)
+                    errors_median[device][beacon][frequency].append(error_median)
+                    errors_max[device][beacon][frequency].append(error_max)
+ 
                     # print(f"Actual Point ({axis}, {ordinate}) - {beacon} ({frequency}):")
                     # print(f"Predicted Point (Based on Mean Likelihood): {best_predicted_point_mean[0]}, {best_predicted_point_mean[1]} - Error: {error_mean}")
                     # print(f"Predicted Point (Based on Median Likelihood): {best_predicted_point_median[0]}, {best_predicted_point_median[1]} - Error: {error_median}")
                     # print(f"Predicted Point (Based on Max Likelihood): {best_predicted_point_max[0]}, {best_predicted_point_max[1]} - Error: {error_max}")
-                    error_mean_combine[beacon][frequency].append(error_mean)
-                    error_median_combine[beacon][frequency].append(error_median)
-                    error_max_combine[beacon][frequency].append(error_max)
-                    # error_list = error_mean_combine[beacon][frequency]
-                    # print(f"{beacon} - {frequency} - Error Mean : {error_list}")
-
-                    combinations = [
-                        [('Wifi_A', '2.4GHz'), ('Wifi_B', '2.4GHz'), ('Wifi_C', '2.4GHz'), ('Wifi_D', '2.4GHz')],
-                        [('Wifi_A', '2.4GHz'), ('Wifi_B', '2.4GHz'), ('Wifi_C', '2.4GHz'), ('Wifi_D', '5GHz')],
-                        [('Wifi_A', '2.4GHz'), ('Wifi_B', '2.4GHz'), ('Wifi_C', '5GHz'), ('Wifi_D', '2.4GHz')],
-                        [('Wifi_A', '2.4GHz'), ('Wifi_B', '5GHz'), ('Wifi_C', '2.4GHz'), ('Wifi_D', '2.4GHz')],
-                        [('Wifi_A', '5GHz'), ('Wifi_B', '2.4GHz'), ('Wifi_C', '2.4GHz'), ('Wifi_D', '2.4GHz')],
-                        [('Wifi_A', '2.4GHz'), ('Wifi_B', '2.4GHz'), ('Wifi_C', '5GHz'), ('Wifi_D', '5GHz')],
-                        [('Wifi_A', '2.4GHz'), ('Wifi_B', '5GHz'), ('Wifi_C', '2.4GHz'), ('Wifi_D', '5GHz')],
-                        [('Wifi_A', '5GHz'), ('Wifi_B', '2.4GHz'), ('Wifi_C', '2.4GHz'), ('Wifi_D', '5GHz')],
-                        [('Wifi_A', '2.4GHz'), ('Wifi_B', '5GHz'), ('Wifi_C', '5GHz'), ('Wifi_D', '2.4GHz')],
-                        [('Wifi_A', '5GHz'), ('Wifi_B', '2.4GHz'), ('Wifi_C', '5GHz'), ('Wifi_D', '2.4GHz')],
-                        [('Wifi_A', '5GHz'), ('Wifi_B', '5GHz'), ('Wifi_C', '2.4GHz'), ('Wifi_D', '2.4GHz')],
-                        [('Wifi_A', '2.4GHz'), ('Wifi_B', '5GHz'), ('Wifi_C', '5GHz'), ('Wifi_D', '5GHz')],
-                        [('Wifi_A', '5GHz'), ('Wifi_B', '2.4GHz'), ('Wifi_C', '5GHz'), ('Wifi_D', '5GHz')],
-                        [('Wifi_A', '5GHz'), ('Wifi_B', '5GHz'), ('Wifi_C', '2.4GHz'), ('Wifi_D', '5GHz')],
-                        [('Wifi_A', '5GHz'), ('Wifi_B', '5GHz'), ('Wifi_C', '5GHz'), ('Wifi_D', '2.4GHz')],
-                        [('Wifi_A', '5GHz'), ('Wifi_B', '5GHz'), ('Wifi_C', '5GHz'), ('Wifi_D', '5GHz')]
-                    ]
-
-                    # Calculate average error for each combination
-                    average_errors_mean = []
-                    average_errors_median = []
-                    average_errors_max = []
-
-                    error_mean_95_list = []
-                    error_median_95_list = []
-                    error_max_95_list = []
-                    
-                    for combination in combinations:
-                        errors_mean = []
-                        errors_median = []
-                        errors_max = []
-
-                        for beacon, frequency in combination:
-                            errors_mean.extend(error_mean_combine[beacon][frequency])
-                            errors_median.extend(error_median_combine[beacon][frequency])
-                            errors_max.extend(error_max_combine[beacon][frequency])
-                        #Mean
-                        average_error_mean = sum(errors_mean) / len(errors_mean) if len(errors_mean) > 0 else 0
-                        average_errors_mean.append(average_error_mean)
-                        #Median
-                        average_error_median = sum(errors_median) / len(errors_median) if len(errors_median) > 0 else 0
-                        average_errors_median.append(average_error_median)
-                        #Max
-                        average_error_max = sum(errors_max) / len(errors_max) if len(errors_max) > 0 else 0
-                        average_errors_max.append(average_error_max)
-
-                        # Print or use the average_errors as needed
-                        # for i, (average_error_mean, average_error_median, average_error_max) in enumerate(zip(average_errors_mean, average_errors_median, average_errors_max), start=1):
-                        #     print((axis, ordinate))
-                        #     print(f'Average Combination {i}:')
-                        #     print(f'  Mean Error: {average_error_mean}')
-                        #     print(f'  Median Error: {average_error_median}')
-                        #     print(f'  Max Error: {average_error_max}')
-
-                        error_mean_95_list.append(np.percentile(error_mean, 95))
-                        error_median_95_list.append(np.percentile(error_median, 95))
-                        error_max_95_list.append(np.percentile(error_max, 95))
-
-                        # print((axis, ordinate))
-                        # print(f'Error mean 95% : {error_mean_95}')
-                        # print(f'Error median 95% : {error_median_95}')
-                        # print(f'Error max 95% : {error_max_95}')
-                    
-                        # Simpan hasil ke dalam file CSV
-                        
-                        with open(output_file, 'w', newline='') as csvfile:
-                            fieldnames = ['axis', 'ordinate', 'combinations', 'average_error_mean', 'average_error_median', 'average_error_max', 'error_mean_95', 'error_median_95', 'error_max_95']
-                            writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-
-                            # Tulis header
-                            writer.writeheader()
-
-                            # Tulis baris untuk setiap kombinasi
-                            for i, (average_error_mean, average_error_median, average_error_max, error_mean_95, error_median_95, error_max_95) in enumerate(zip(average_errors_mean, average_errors_median, average_errors_max, error_mean_95_list, error_median_95_list, error_max_95_list), start=1):
-                                writer.writerow({
-                                    'axis': axis,
-                                    'ordinate': ordinate,
-                                    'combinations': f'Combination {i}',
-                                    'average_error_mean': average_error_mean,
-                                    'average_error_median': average_error_median,
-                                    'average_error_max': average_error_max,
-                                    'error_mean_95': error_mean_95,
-                                    'error_median_95': error_median_95,
-                                    'error_max_95': error_max_95
-                                })
-
-print(f'Hasil berhasil disimpan ke dalam file: {output_file}')
-
+    return errors_mean, errors_median, errors_max
                     
 
-def main():
+def main(): 
     # Define the folder paths
     data_root = ""
     data_folder = os.path.join(data_root, "dataset")
@@ -247,7 +165,12 @@ def main():
                             # print(rssi_centering)
                         # print(rssi_values_td)
                         # print(rssi_centering)
-    predict(train_data, test_data)
+    errors_mean, errors_median, errors_max = predict(train_data, test_data)
+    # Print or process the errors as needed
+    print("Errors (Mean):", errors_mean)
+    print("Errors (Median):", errors_median)
+    print("Errors (Max):", errors_max)
+
 if __name__ == "__main__":
     main()
 
