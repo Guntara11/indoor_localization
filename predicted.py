@@ -167,9 +167,40 @@ def main():
                         # print(rssi_centering)
     errors_mean, errors_median, errors_max = predict(train_data, test_data)
     # Print or process the errors as needed
-    print("Errors (Mean):", errors_mean)
-    print("Errors (Median):", errors_median)
-    print("Errors (Max):", errors_max)
+    # print("Errors (Mean):", errors_mean)
+    # print("Errors (Median):", errors_median)
+    # print("Errors (Max):", errors_max)
+    a23_error_mean_WifiA_2G = errors_mean['a23']['Wifi_A']['2.4GHz']
+    a23_error_mean_WifiB_2G = errors_mean['a23']['Wifi_B']['2.4GHz']
+    a23_error_mean_WifiC_2G = errors_mean['a23']['Wifi_C']['2.4GHz']
+    a23_error_mean_WifiD_2G = errors_mean['a23']['Wifi_D']['2.4GHz']
+    a23_error_mean_WifiA_5G = errors_mean['a23']['Wifi_A']['5GHz']
+    a23_error_mean_WifiB_5G = errors_mean['a23']['Wifi_B']['5GHz']
+    a23_error_mean_WifiC_5G = errors_mean['a23']['Wifi_C']['5GHz']
+    a23_error_mean_WifiD_5G = errors_mean['a23']['Wifi_D']['5GHz']
+
+    f3_error_mean_WifiA_2G = errors_mean['f3']['Wifi_A']['2.4GHz']
+    f3_error_mean_WifiB_2G = errors_mean['f3']['Wifi_B']['2.4GHz']
+    f3_error_mean_WifiC_2G = errors_mean['f3']['Wifi_C']['2.4GHz']
+    f3_error_mean_WifiD_2G = errors_mean['f3']['Wifi_D']['2.4GHz']
+    f3_error_mean_WifiA_5G = errors_mean['f3']['Wifi_A']['5GHz']
+    f3_error_mean_WifiB_5G = errors_mean['f3']['Wifi_B']['5GHz']
+    f3_error_mean_WifiC_5G = errors_mean['f3']['Wifi_C']['5GHz']
+    f3_error_mean_WifiD_5G = errors_mean['f3']['Wifi_D']['5GHz']
+
+    # print(a23_error_mean_WifiA_2G)
+    # print(a23_error_mean_WifiB_2G)
+    addlist1 = np.add(a23_error_mean_WifiA_2G, a23_error_mean_WifiB_2G)
+    addlist2 = np.add(a23_error_mean_WifiC_2G, a23_error_mean_WifiD_2G)
+    sumadd = np.add(addlist1, addlist2)
+    # print(sumadd)
+    mean_error_combination = np.mean(np.vstack([a23_error_mean_WifiA_2G,a23_error_mean_WifiB_2G, a23_error_mean_WifiC_2G, a23_error_mean_WifiD_2G]), axis=0).tolist()
+    average_mean_error = np.mean(mean_error_combination)
+    
+    percent_95 = np.percentile([mean_error_combination],95)
+    
+    print("rerata galat :", average_mean_error)
+    print("percent 95 : ", percent_95)
 
 if __name__ == "__main__":
     main()
