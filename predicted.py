@@ -135,7 +135,7 @@ def main():
 
         for device in devices:
             device_folder = os.path.join(dataset_folder, device)
-            partition_1_path = os.path.join(device_folder, "partition_1")
+            partition_1_path = os.path.join(device_folder, "partition_5")
 
             for file_name in os.listdir(partition_1_path):
                 file_path = os.path.join(partition_1_path, file_name)
@@ -400,7 +400,7 @@ def main():
     df = pd.DataFrame(data)
 
     # Save to Excel
-    df.to_excel('predict_skema1.xlsx', index=False)
+    df.to_excel('predict_skema1_part5.xlsx', index=False)
 
 if __name__ == "__main__":
     main()

@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-folder_path = "calibrated_skema2/test"
-output_folder = "centering_data_skema2"
+folder_path = "dataset/test/a23/partition_5"
+output_folder = "centering_data_raw"
 
 RP_points = []
 means = []
@@ -54,9 +54,9 @@ result_max = pd.concat([points_df, max_df], axis=1)
 
 
 # Save the results to CSV files in the output folder
-result_mean.to_csv(os.path.join(output_folder, "mean_results.csv"), index=False)
-result_median.to_csv(os.path.join(output_folder, "median_results.csv"), index=False)
-result_max.to_csv(os.path.join(output_folder, "max_results.csv"), index=False)
+result_mean.to_csv(os.path.join(output_folder, "mean_results_part5.csv"), index=False)
+result_median.to_csv(os.path.join(output_folder, "median_results_part5.csv"), index=False)
+result_max.to_csv(os.path.join(output_folder, "max_results_part5.csv"), index=False)
 
 
 ############################################## section for plotting ###########################################################
@@ -73,7 +73,7 @@ for i, wifi_type in enumerate(selected_columns):
 cbar_ax_mean = fig_mean.add_axes([0.92, 0.15, 0.02, 0.7])  # [x, y, width, height]
 cbar_mean = fig_mean.colorbar(axes_mean[0].collections[0], cax=cbar_ax_mean, label='Values')
 fig_mean.suptitle("Mean Signal Strength for Each WiFi Type")
-fig_mean.savefig("fingerprint/mean_signal_strength_skema2.png")
+fig_mean.savefig("fingerprint/mean_signal_strength_partition_5.png")
 plt.show()
 
 fig_median, axes_median = plt.subplots(1, len(selected_columns), figsize=(16, 4), sharex=True, sharey=True)
@@ -89,7 +89,7 @@ for i, wifi_type in enumerate(selected_columns):
 cbar_ax_median = fig_median.add_axes([0.92, 0.15, 0.02, 0.7])  # [x, y, width, height]
 cbar_median = fig_median.colorbar(axes_median[0].collections[0], cax=cbar_ax_median, label='Values')
 fig_median.suptitle("Median Signal Strength for Each WiFi Type")
-fig_mean.savefig("fingerprint/median_signal_strength_skema2.png")
+fig_mean.savefig("fingerprint/median_signal_strength_partition_5.png")
 plt.show()
 
 # Plot max for each WiFi type
@@ -106,7 +106,7 @@ for i, wifi_type in enumerate(selected_columns):
 cbar_ax_max = fig_max.add_axes([0.92, 0.15, 0.02, 0.7])  # [x, y, width, height]
 cbar_max = fig_max.colorbar(axes_max[0].collections[0], cax=cbar_ax_max, label='Values')
 fig_max.suptitle("Max Signal Strength for Each WiFi Type")
-fig_mean.savefig("fingerprint/max_signal_strength_skema2.png")
+fig_mean.savefig("fingerprint/max_signal_strength_partition_5.png")
 plt.show()
 
 #########################uncomment this if u want to make of room an RP points with centering data as data in RP points################################
