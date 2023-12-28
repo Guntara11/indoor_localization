@@ -22,33 +22,50 @@ def process_csv(file_path):
 
     return df
 
+
 # Folder paths
 input_folders = {
-    "train": "modified_skema2/a23",
-    "test": "modified_skema2/f3"
+    "train": [
+        "calibrated_dataset/train/a23/partition_1",
+        "calibrated_dataset/train/a23/partition_2",
+        "calibrated_dataset/train/a23/partition_3",
+        "calibrated_dataset/train/a23/partition_4",
+        "calibrated_dataset/train/a23/partition_5",
+        "calibrated_dataset/train/f3/partition_1",
+        "calibrated_dataset/train/f3/partition_2",
+        "calibrated_dataset/train/f3/partition_3",
+        "calibrated_dataset/train/f3/partition_4",
+        "calibrated_dataset/train/f3/partition_5"
+    ],
+    "test": [
+        "calibrated_dataset/test/a23/partition_1",
+        "calibrated_dataset/test/a23/partition_2",
+        "calibrated_dataset/test/a23/partition_3",
+        "calibrated_dataset/test/a23/partition_4",
+        "calibrated_dataset/test/a23/partition_5",
+        "calibrated_dataset/test/f3/partition_1",
+        "calibrated_dataset/test/f3/partition_2",
+        "calibrated_dataset/test/f3/partition_3",
+        "calibrated_dataset/test/f3/partition_4",
+        "calibrated_dataset/test/f3/partition_5"
+    ]
 }
-output_parent_folder = "calibrated_skema2"
 
-for dataset_type in input_folders:
-    output_folder = os.path.join(output_parent_folder, dataset_type)
-    os.makedirs(output_folder, exist_ok=True)
+for dataset_type, input_folder_list in input_folders.items():
+    for input_folder in input_folder_list:
+        # List all files in the input folder
+        file_list = os.listdir(input_folder)
 
+        # Process each CSV file in the input folder
+        for file_name in file_list:
+            if file_name.endswith(".csv"):
+                input_file_path = os.path.join(input_folder, file_name)
 
-for dataset_type, input_folder in input_folders.items():
-    # List all files in the input folder
-    file_list = os.listdir(input_folder)
+                # Process the CSV file
+                processed_data = process_csv(input_file_path)
 
-    # Process each CSV file in the input folder
-    for file_name in file_list:
-        if file_name.endswith(".csv"):
-            input_file_path = os.path.join(input_folder, file_name)
-
-            # Process the CSV file
-            processed_data = process_csv(input_file_path)
-
-            # Save the processed data to the output folder
-            output_folder = os.path.join(output_parent_folder, dataset_type)
-            output_file_path = os.path.join(output_folder, file_name)
-            processed_data.to_csv(output_file_path, index=False)
+                # Save the processed data to the output folder
+                # output_file_path = os.path.join(input_folder, file_name)
+                processed_data.to_csv(input_file_path, index=False)
 
 print("Data calibration complete. Calibrated data saved in the 'calibrated' folder.")

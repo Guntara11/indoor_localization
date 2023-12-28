@@ -112,5 +112,5 @@ def main() :
                 #         # Append the statistics to the existing or new CSV file
                 #         utils.append_to_csv(rawData, [stats], headers=['Column', 'Mean', 'Median', 'Maximum'])  
 
-if __name__ == "__main__":
+if __name__ == "_main_":
     main()
