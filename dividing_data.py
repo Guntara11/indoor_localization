@@ -141,6 +141,35 @@ if __name__ == "__main__":
                 dataset_file_destination = os.path.join(dataset_train_f3_path, dataset_file)
                 split_data(dataset_split_path=dataset_train_f3_path, dataset_file=dataset_file, dataset_file_origin=dataset_file_origin)
 
+####################################################################################################################
+# Pindahkan code di bawah blok komen ke main py , dan juga buat proses di bawah untuk memproses semua data 
+# yang ada di folder train dan test, 
+# ##################################################################################################################
+    #     # Load the train and test CSV files
+    # train_data = pd.read_csv("train_modified (0,1)_a23 - 08-08-2023 14-10-13.csv_partition_1.csv")
+    # test_dataset = pd.read_csv("test_modified (0,1)_a23 - 08-08-2023 14-10-13.csv_partition_1.csv")
+
+    # scaler = MinMaxScaler()
+    # test_dataset[["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]] = scaler.fit_transform(test_dataset[["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]])
+    # print("Specific Test Data (After Scaling):")
+    # print(test_dataset)
+
+    # # Specify the columns for Bayesian estimation
+    # stat_data = pd.read_csv("Raw_statData_Wifi_A.csv")
+    # centers = stat_data[["Mean", "Median", "Maximum"]].values
+    # # for i, (train_data, test_data) in enumerate(partitioned_data, 1):
+    # distances_mean = []
+    # distances_median = []
+    # distances_maximum = []
+
+    # for column in ["Wifi_A", "Wifi_B", "Wifi_C", "Wifi_D"]:
+    #     test_column = test_dataset[column]
+    #     mean = stat_data.at[0, "Mean"]
+    #     median = stat_data.at[0, "Median"]
+    #     maximum = stat_data.at[0, "Maximum"]
+    #     distances_mean.append(euclidean_distance(test_column, mean))
+    #     distances_median.append(euclidean_distance(test_column, median))
+    #     distances_maximum.append(euclidean_distance(test_column, maximum))
 
 
         if os.path.exists(dataset_calibration_path):
