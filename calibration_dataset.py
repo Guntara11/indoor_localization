@@ -24,10 +24,10 @@ def process_csv(file_path):
 
 # Folder paths
 input_folders = {
-    "train": "dataset/train/a23/partition_1",
-    "test": "dataset/test/a23/partition_1"
+    "train": "modified_skema2/a23",
+    "test": "modified_skema2/f3"
 }
-output_parent_folder = "calibrated"
+output_parent_folder = "calibrated_skema2"
 
 for dataset_type in input_folders:
     output_folder = os.path.join(output_parent_folder, dataset_type)

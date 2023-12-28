@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-folder_path = "dataset/test/a23/partition_1"
-output_folder = "centering_data_raw"
+folder_path = "calibrated_skema2/test"
+output_folder = "centering_data_skema2"
 
 RP_points = []
 means = []
@@ -73,7 +73,7 @@ for i, wifi_type in enumerate(selected_columns):
 cbar_ax_mean = fig_mean.add_axes([0.92, 0.15, 0.02, 0.7])  # [x, y, width, height]
 cbar_mean = fig_mean.colorbar(axes_mean[0].collections[0], cax=cbar_ax_mean, label='Values')
 fig_mean.suptitle("Mean Signal Strength for Each WiFi Type")
-fig_mean.savefig("fingerprint/mean_signal_strength.png")
+fig_mean.savefig("fingerprint/mean_signal_strength_skema2.png")
 plt.show()
 
 fig_median, axes_median = plt.subplots(1, len(selected_columns), figsize=(16, 4), sharex=True, sharey=True)
@@ -89,7 +89,7 @@ for i, wifi_type in enumerate(selected_columns):
 cbar_ax_median = fig_median.add_axes([0.92, 0.15, 0.02, 0.7])  # [x, y, width, height]
 cbar_median = fig_median.colorbar(axes_median[0].collections[0], cax=cbar_ax_median, label='Values')
 fig_median.suptitle("Median Signal Strength for Each WiFi Type")
-fig_mean.savefig("fingerprint/median_signal_strength.png")
+fig_mean.savefig("fingerprint/median_signal_strength_skema2.png")
 plt.show()
 
 # Plot max for each WiFi type
@@ -106,7 +106,7 @@ for i, wifi_type in enumerate(selected_columns):
 cbar_ax_max = fig_max.add_axes([0.92, 0.15, 0.02, 0.7])  # [x, y, width, height]
 cbar_max = fig_max.colorbar(axes_max[0].collections[0], cax=cbar_ax_max, label='Values')
 fig_max.suptitle("Max Signal Strength for Each WiFi Type")
-fig_mean.savefig("fingerprint/max_signal_strength.png")
+fig_mean.savefig("fingerprint/max_signal_strength_skema2.png")
 plt.show()
 
 #########################uncomment this if u want to make of room an RP points with centering data as data in RP points################################

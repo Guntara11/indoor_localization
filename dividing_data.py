@@ -79,8 +79,8 @@ if __name__ == "__main__":
                     print(f"Size of test Data (20%): {test_data.shape[0]} rows")
 
                     # Save the Bayesian and Kalman data to separate CSV files for each partition
-                    train_data.to_csv(f'dataset/train_{file_name}_partition_{i}.csv', index=False)
-                    test_data.to_csv(f'dataset/test_{file_name}_partition_{i}.csv', index=False)
+                    train_data.to_csv(f'dataset_skema2/train_{file_name}_partition_{i}.csv', index=False)
+                    test_data.to_csv(f'dataset_skema2/test_{file_name}_partition_{i}.csv', index=False)
                 print("Train Data (First Partition):")
                 print(partitioned_data[0][0])
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
                 print(partitioned_data[0][1])
 
     #folder path dataset
-    dataset_path = "dataset"
+    dataset_path = "dataset_skema2"
 
     #folder path dataset test dan train
     dataset_test_path = os.path.join(dataset_path, "test")
