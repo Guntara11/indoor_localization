@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 
 
-folder_path = "dataset/test/a23/partition_1"
+folder_path = "calibrated_dataset/test/a23/partition_1"
 output_folder = "centering_data_raw"
 
 RP_points = []
