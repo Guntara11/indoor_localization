@@ -1,10 +1,9 @@
-import utils
 import os
 import numpy as np
 import pandas as pd
 import tkinter as tk 
 from tkinter import filedialog
-from utils import kalman_block, kalman_filter, calculate_statistics
+from utils import *
 
 
 # def choose_output_folder(input_file_name, filterDataDict):
@@ -61,7 +60,9 @@ def main() :
                 filtered_df = pd.DataFrame(filtered_data)
                 
                 # Create a folder 'filtered_output' if it doesn't exist
-                output_folder = 'filteredData_42titik'
+                output_folder = 'filtered_modified_output'
+                output_folder_f3 = os.path.join(output_folder, "f3")
+                output_folder_a23 = os.path.join(output_folder, "a23")
                 if not os.path.exists(output_folder):
                     os.mkdir(output_folder)
 
@@ -69,11 +70,16 @@ def main() :
                 file_name_without_ext = os.path.splitext(file_name)[0]
 
                 # Save the filtered data to a CSV file in 'filtered_output' folder
-                output_file_path = os.path.join(output_folder, f"{file_name_without_ext}_filtered.csv")
-                filtered_df.to_csv(output_file_path, index=False)
-
-                print(f"Filtered data from {file_name} saved to: {output_file_path}")
-                
+                if ("_f3" in file_path or "_f23" in file_path or "_F3" in file_path):
+                    output_file_path = os.path.join(output_folder_f3, f"{file_name_without_ext}_filtered.csv")
+                    filtered_df.to_csv(output_file_path, index=False)
+                    print(f"Filtered data from {file_name} saved to: {output_file_path}")
+                elif("_a23" in file_path):
+                    output_file_path = os.path.join(output_folder_a23, f"{file_name_without_ext}_filtered.csv")
+                    filtered_df.to_csv(output_file_path, index=False)
+                    print(f"Filtered data from {file_name} saved to: {output_file_path}")
+                else:
+                    print("wrong output directory")
                 # # calculate and print mean, median, max 
                 # for column_name in column_to_analyze:
                 #     stats =calculate_statistics(modified_df, column_name)
