@@ -1,0 +1,27 @@
+skema 1 : 
+- modified_data.py
+- dividing_data.py 
+- build_fingerprint.py 
+- predict.py 
+
+skema2 :
+- modified_data.py 
+- dividing_data.py
+- calibration_data.py
+- build_fingerprint.py
+- predict.py 
+
+skema3 : 
+- modified_data.py 
+- filtering_data.py
+- dividing_data.py
+- build_fingerprint.py 
+- predict.py 
+
+skema4 :
+- modified_data.py 
+- filtering_data.py
+- dividing_data.py
+-calibration_data.py
+- build_fingerprint.py 
+- predict.py  
