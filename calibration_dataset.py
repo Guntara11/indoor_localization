@@ -10,7 +10,7 @@ def process_csv(file_path):
     df = pd.read_csv(file_path)
 
     # Drop unnecessary columns
-    df = df.drop(['TimeStampMillis', 'TimeStampFormatted'], axis=1)
+    # df = df.drop(['TimeStampMillis', 'TimeStampFormatted'], axis=1)
 
     # Columns to be calibrated using Min-Max scaling
     columns_to_scale = ['Wifi_A', 'Wifi_A_5G', 'Wifi_C', 'Wifi_B', 'Wifi_B_5G', 'Wifi_C_5G', 'Wifi_D', 'Wifi_D_5G']
@@ -35,7 +35,17 @@ input_folders = {
         "calibrated_dataset/train/f3/partition_2",
         "calibrated_dataset/train/f3/partition_3",
         "calibrated_dataset/train/f3/partition_4",
-        "calibrated_dataset/train/f3/partition_5"
+        "calibrated_dataset/train/f3/partition_5",
+        "filtered_calibrated_dataset/train/a23/partition_1",
+        "filtered_calibrated_dataset/train/a23/partition_2",
+        "filtered_calibrated_dataset/train/a23/partition_3",
+        "filtered_calibrated_dataset/train/a23/partition_4",
+        "filtered_calibrated_dataset/train/a23/partition_5",
+        "filtered_calibrated_dataset/train/f3/partition_1",
+        "filtered_calibrated_dataset/train/f3/partition_2",
+        "filtered_calibrated_dataset/train/f3/partition_3",
+        "filtered_calibrated_dataset/train/f3/partition_4",
+        "filtered_calibrated_dataset/train/f3/partition_5"
     ],
     "test": [
         "calibrated_dataset/test/a23/partition_1",
@@ -47,7 +57,17 @@ input_folders = {
         "calibrated_dataset/test/f3/partition_2",
         "calibrated_dataset/test/f3/partition_3",
         "calibrated_dataset/test/f3/partition_4",
-        "calibrated_dataset/test/f3/partition_5"
+        "calibrated_dataset/test/f3/partition_5",
+        "filtered_calibrated_dataset/test/a23/partition_1",
+        "filtered_calibrated_dataset/test/a23/partition_2",
+        "filtered_calibrated_dataset/test/a23/partition_3",
+        "filtered_calibrated_dataset/test/a23/partition_4",
+        "filtered_calibrated_dataset/test/a23/partition_5",
+        "filtered_calibrated_dataset/test/f3/partition_1",
+        "filtered_calibrated_dataset/test/f3/partition_2",
+        "filtered_calibrated_dataset/test/f3/partition_3",
+        "filtered_calibrated_dataset/test/f3/partition_4",
+        "filtered_calibrated_dataset/test/f3/partition_5"
     ]
 }
 
