@@ -9,9 +9,6 @@ def process_csv(file_path):
     # Read the CSV file
     df = pd.read_csv(file_path)
 
-    # Drop unnecessary columns
-    # df = df.drop(['TimeStampMillis', 'TimeStampFormatted'], axis=1)
-
     # Columns to be calibrated using Min-Max scaling
     columns_to_scale = ['Wifi_A', 'Wifi_A_5G', 'Wifi_C', 'Wifi_B', 'Wifi_B_5G', 'Wifi_C_5G', 'Wifi_D', 'Wifi_D_5G']
 

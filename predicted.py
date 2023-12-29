@@ -113,17 +113,13 @@ def predict(train_data, test_data):
                     errors_median[device][beacon][frequency].append(error_median)
                     errors_max[device][beacon][frequency].append(error_max)
  
-                    # print(f"Actual Point ({axis}, {ordinate}) - {beacon} ({frequency}):")
-                    # print(f"Predicted Point (Based on Mean Likelihood): {best_predicted_point_mean[0]}, {best_predicted_point_mean[1]} - Error: {error_mean}")
-                    # print(f"Predicted Point (Based on Median Likelihood): {best_predicted_point_median[0]}, {best_predicted_point_median[1]} - Error: {error_median}")
-                    # print(f"Predicted Point (Based on Max Likelihood): {best_predicted_point_max[0]}, {best_predicted_point_max[1]} - Error: {error_max}")
     return errors_mean, errors_median, errors_max
                     
 
 def main(): 
     # Define the folder paths
     data_root = ""
-    data_folder = os.path.join(data_root, "dataset")
+    data_folder = os.path.join(data_root, "filtered_calibrated_dataset")
 
     train_data = []
     test_data = []
@@ -160,15 +156,9 @@ def main():
                             rssi_values_rp = rssi_values
                             mean_value, median_value, max_value, variance_value = calculate_metrics(rssi_values_rp)
                             test_data.append([device_info, axis, ordinate, beacon, frequency, mean_value, median_value, max_value, variance_value, rssi_values_rp])
-                            # rssi_centering.append([mean_value, median_value, max_value, variance_value])
-                            # print(rssi_centering)
-                        # print(rssi_values_td)
-                        # print(rssi_centering)
+                            
     errors_mean, errors_median, errors_max = predict(train_data, test_data)
-    # Print or process the errors as needed
-    # print("Errors (Mean):", errors_mean)
-    # print("Errors (Median):", errors_median)
-    # print("Errors (Max):", errors_max)
+    
     a23_error_mean_WifiA_2G = errors_mean['a23']['Wifi_A']['2.4GHz']
     a23_error_mean_WifiB_2G = errors_mean['a23']['Wifi_B']['2.4GHz']
     a23_error_mean_WifiC_2G = errors_mean['a23']['Wifi_C']['2.4GHz']
@@ -400,7 +390,7 @@ def main():
     df = pd.DataFrame(data)
 
     # Save to Excel
-    df.to_excel('predict_skema1_part5.xlsx', index=False)
+    df.to_excel('predict_skema4_part5.xlsx', index=False)
 
 if __name__ == "__main__":
     main()
